@@ -15,6 +15,8 @@ module Focuslight
     attr_accessor :meta
     attr_accessor :created_at_time, :updated_at_time
 
+    attr_accessor :c_type, :c_gmode, :stack # for complex graph construction
+
     def initialize(row)
       @row_hash = row
 

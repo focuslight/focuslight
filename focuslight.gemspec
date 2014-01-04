@@ -24,4 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "foreman"
   spec.add_runtime_dependency "sinatra"
   spec.add_runtime_dependency "sqlite3"
+  spec.add_runtime_dependency "librrd"
+  spec.add_runtime_dependency "rrd-ffi"
 end
