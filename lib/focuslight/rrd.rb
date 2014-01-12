@@ -265,44 +265,12 @@ class Focuslight::RRD
       raise "RRDtool returns error to draw graph, error: #{RRD::Wrapper.error}"
     end
 
-    # TODO: how to get last PRINT return value, set of [current,avg,max,min] of each data source !?
-    # graph_values = ....
-    #################
+    # Cannot get last PRINT return value, set of [current,avg,max,min] of each data source
+    # This makes 'summary' API not supported
 
-    <<PERL
-$i=0;
-    my %graph_args;
-    for my $data ( @datas ) {
-        my ($current,$average,$max,$min) = (
-            $graphv[0]->[$i],
-            $graphv[0]->[$i+1],
-            $graphv[0]->[$i+2],
-            $graphv[0]->[$i+3]
-        );
-
-############## $graph_args{$data->{graph_name}} is unsafe ??????????????????????????
-
-        $graph_args{$data->{graph_name}} = [$current, $average, $max, $min];
-        $i = $i + 4;
-    }
-    if ( $args->{sumup} ) {
-        my ($current,$average,$max,$min) = (
-            $graphv[0]->[$i],
-            $graphv[0]->[$i+1],
-            $graphv[0]->[$i+2],
-            $graphv[0]->[$i+3]
-        );
-        $graph_args{'total'} = [$current, $average, $max, $min];
-    }
-    open( my $fh, '<:bytes', $tmpfile ) or die "cannot open graph tmpfile: $!";
-    local $/;
-    my $graph_img = <$fh>;
-    unlink($tmpfile);
-
-    die 'something wrong with image' unless $graph_img;
-
-    return ($graph_img,\%graph_args);
-PERL
+    graph_img = IO.binread(tmpfile.path); # read as binary
+    tmpfile.delete
+    graph_img
   end
 
   def export(datas, args)
@@ -357,40 +325,29 @@ PERL
     unless ret
       raise "RRDtool returns error to xport, error: #{RRD::Wrapper.error}"
     end
-    ################ TODO: return value
-    <<PERL
-my ($start_timestamp, $end_timestamp, $step, $columns, $column_names, $rows) = RRDs::xport(map { Encode::encode_utf8($_) } @opt);
-        my $ERR=RRDs::error;
-        die $ERR if $ERR;
-        $export{start_timestamp} = $start_timestamp;
-        $export{end_timestamp} = $end_timestamp;
-        $export{step} = $step;
-        $export{columns} = $columns;
-        $export{column_names} = $column_names;
-        $export{rows} = $rows;
-    };
-    if ( $@ ) {
-        die "export failed: $@";
-    }
-    return \%export;
-PERL
-    <<RUBY
-        result = [["time"] + legends]
-        (0..result_lines-1).each do |line|
-          date = start_time + line*step
-          first = legends_count*line
-          last = legends_count*line + legends_count - 1
-          result << [date] + values[first..last]
-        end
-RUBY
-    # TODO: return values
+    ### copied from RRD::Wrapper spec
+    # values = RRD::Wrapper.xport("--start", "1266933600", "--end", "1266944400", "DEF:xx=#{RRD_FILE}:cpu0:AVERAGE", "XPORT:xx:Legend 0")
+    # values[0..-2].should == [["time", "Legend 0"], [1266933600, 0.0008], [1266937200, 0.0008], [1266940800, 0.0008]]
+    cols_row = ret.shift
+
+    column_names = cols_row[1..-1] # cols_row[0] == 'time'
+    columns = column_names.length
+    start_timestamp = ret.first.first
+    end_timestamp = ret.last.first
+    step = ret[1].first - ret[0].first
+
+    rows = []
+    ret.each do |values|
+      rows << values[1..-1]
+    end
+
     {
-      'start_timestamp' => '',
-      'end_timestamp' => '',
-      # 'step' => '', # unused in GrowthForecast
-      'columns' => [],
-      'column_names' => [],
-      'rows' => [],
+      'start_timestamp' => start_timestamp,
+      'end_timestamp' => end_timestamp,
+      'step' => step,
+      'columns' => columns,
+      'column_names' => column_names,
+      'rows' => rows,
     }
   end
 
