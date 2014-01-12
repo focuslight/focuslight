@@ -151,7 +151,7 @@ class Focuslight::RRD
       xgrid = 'HOUR:1:HOUR:2:HOUR:2:0:%H'
     end
 
-    return (period_title, period, period_end, xgrid)
+    return [period_title, period, period_end, xgrid]
   end
 
   def graph(datas, args)
