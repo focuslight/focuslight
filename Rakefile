@@ -1,5 +1,11 @@
 require "bundler/gem_tasks"
 
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = ["-c", "-f progress"] # '--format specdoc'
+  t.pattern = 'spec/**/*_spec.rb'
+end
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'dotenv/tasks'
@@ -16,3 +22,6 @@ end
 task :shorter => :dotenv do
   Focuslight::Worker.run(interval: 60, target: :short)
 end
+
+task :test => :spec
+task :default => :spec
