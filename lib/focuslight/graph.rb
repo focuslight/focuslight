@@ -137,13 +137,24 @@ module Focuslight
       super
 
       uri = ['type-1', 'path-1', 'gmode-1'].map{|k| @parsed_meta[k]}.join(':') + ':0' # stack
+
+      data_rows = []
+
+      first_row = {
+        type: @parsed_meta['type-1'],
+        path: @parsed_meta['path-1'],
+        gmode: @parsed_meta['gmode-1'],
+        stack: false,
+        graphid: @parsed_meta['path-1'],
+      }
+      data_rows << first_row
+
       unless @parsed_meta['type-2'].is_a?(Array)
         ['type-2', 'path-2', 'gmode-2', 'stack-2'].each do |key|
-          @parsed_meta[key] = [@parsed_meta[key]]
+          @parsed_meta[key] = [@parsed_meta[key]].flatten
         end
       end
 
-      data_rows = []
       @parsed_meta['type-2'].each_with_index do |type, i|
         t = @parsed_meta['type-2'][i]
         p = @parsed_meta['path-2'][i] # id?
