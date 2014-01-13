@@ -74,6 +74,10 @@ module Focuslight
         return
       end
 
+      unless values.is_a?(Array)
+        values = [values]
+      end
+
       rules = [spec[:rule]].flatten
 
       error_values = []
