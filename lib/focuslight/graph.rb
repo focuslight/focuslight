@@ -42,6 +42,14 @@ module Focuslight
     def updated_at
       @updated_at_time.strftime('%Y/%m/%d %T')
     end
+
+    def to_hash
+      {
+        id: @id, service_name: @service, section_name: @section, graph_name: @graph,
+        number: @number, description: @description, sort: @sort, meta: @meta,
+        created_at: self.created_at(), updated_at: self.updated_at(),
+      }
+    end
   end
 
   class SimpleGraph < Graph
@@ -69,9 +77,20 @@ module Focuslight
 
       @md5 = Digest::MD5.hex_digest(@id.to_s)
 
-      @adjust = @parsed_meta.fetch('adjuste', '*')
+      @adjust = @parsed_meta.fetch('adjust', '*')
       @adjustval = @parsed_meta.fetch('adjustval', '1')
       @unit = @parsed_meta.fetch('unit', '')
+    end
+
+    def to_hash
+      simple = {
+        mode: @mode, gmode: @gmode, color: @color,
+        ulimit: @ulimit, llimit: @llimit, sulimit: @sulimit, sllimit: @sllimit,
+        type: @type, stype: @stype, md5: @md5,
+        adjust: @adjust, adjustval: @adjustval, unit: @unit
+      }
+      hash = super
+      hash.merge(simple)
     end
 
     def complex?
@@ -137,6 +156,11 @@ module Focuslight
       @sumup = @parsed_meta.fetch('sump', 0)
       @data_rows = data_rows
       @complex_graph = uri
+    end
+
+    def to_hash
+      # no api exists for complex graph json
+      raise NotImplementedError
     end
 
     def complex?
