@@ -17,8 +17,19 @@ class Focuslight::Web < Sinatra::Base
   set :public_folder, File.join(__dir__, '..', '..', 'public')
   set :views,         File.join(__dir__, '..', '..', 'views')
 
+  ### TODO: both of static method and helper method
   def self.rule(*args)
     Focuslight::Validator.rule(*args)
+  end
+
+  ### TODO: both of static method and helper method
+  def self.gmode_choice
+    ['gauge', 'subtract'] #TODO: disable_subtract
+  end
+
+  ### TODO: both of static method and helper method
+  def self.gmode_choice_edit_graph
+    ['gauge', 'subtract', 'both'] #TODO: disable_subtract
   end
 
   configure do
@@ -47,8 +58,15 @@ class Focuslight::Web < Sinatra::Base
       @data ||= Focuslight::Data.new #TODO mysql support
     end
 
-    def number_type
-      data().number_type
+    def number_type_rule
+      case data().number_type
+      when 'REAL'
+        Focuslight::Validator.rule(:real)
+      when 'INT'
+        Focuslight::Validator.rule(:int)
+      else
+        raise "unknown number_type #{data().number_type}"
+      end
     end
 
     def rrd
@@ -156,19 +174,55 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    erb :edit, locals: { graph: request.stash[:graph] } # TODO: disable_subtract
   end
 
   post '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    edit_graph_spec = {
+      service_name: { rule: rule(:not_blank) },
+      section_name: { rule: rule(:not_blank) },
+      graph_name:  { rule: rule(:not_blank) },
+      description: { default: '' },
+      sort:  { rule: [ rule(:not_blank), rule(:int_range, 0..19) ] },
+      gmode: { rule: [ rule(:not_blank), rule(:choice, gmode_choice_edit_graph()) ] },
+      adjust:    { default: '*', rule: [ rule(:not_blank), rule(:choice, '*', '/') ] },
+      adjustval: { default: '1', rule: [ rule(:not_blank), rule(:natural) ] },
+      unit: { default: '' },
+      color: { rule: [ rule(:not_blank), rule(:regexp, /^#[0-9a-f]{6}$/i) ] },
+      type:  { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
+      stype: { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
+      llimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
+      ulimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
+      sllimit: { rule: [ rule(:not_blank), number_type_rule() ] },
+      sulimit: { rule: [ rule(:not_blank), number_type_rule() ] },
+    }
+    req_params = validator(params, edit_graph_spec)
+
+    if req_params.has_error?
+      json({error: 1, messages: req_params.errors})
+    else
+      data().update_graph(request.stash[:graph].id, req_params.hash)
+      edit_path = "/list/%s/%s/%s" % [:service_name,:section_name,:graph_name].map{|s| urlencode(req_params[s])}
+      json({error: 0, location: url_for(edit_path)})
+    end
   end
 
   post '/delete/:service_name/:section_name' do
-    #TODO
+    graphs = data().get_graphs(params[:service_name], params[:section_name])
+    graphs.each do |graph|
+      if graph.complex?
+        data().remove_complex(graph.id)
+      else
+        data().remove(graph.id)
+        rrd().remove(graph)
+      end
+    end
+    service_path = "/list/%s" % [ urlencode(params[:service_name]) ]
+    json({ error: 0, location: url_for(service_path) })
   end
 
   post '/delete/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    delete(request.stash[:graph])
   end
 
   get '/add_complex' do
@@ -263,62 +317,122 @@ class Focuslight::Web < Sinatra::Base
     delete(request.stash[:graph]).to_json
   end
 
-  graph_rendering_request_spec_generator = ->(){
-    {
-      method: { rule: [ rule(:not_blank), rule(:choice, 'xport', 'graph') ] }, # TODO: 'summary' is not supported yet
-      service_name: not_specified_or_not_whitespece,
-      section_name: not_specified_or_not_whitespece,
-      graph_name: not_specified_or_not_whitespece,
-      complex: not_specified_or_not_whitespece,
-      t: { default: 'd', rule: rule(:choice, 'd', 'h', 'm', 'sh', 'sd') },
-      gmode: { default: 'gauge', rule: rule(:choice, gmode_choice()) },
-      from: {
-        default: (Time.now - 86400*8).strftime('%Y/%m/%d %T'),
-        rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
-      },
-      to: {
-        default: Time.now.strftime('%Y/%m/%d %T'),
-        rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
-      },
-      width:  { default: '390', rule: rule(:natural) },
-      height: { default: '110', rule: rule(:natural) },
-      graphonly: { default: 'false', rule: rule(:bool) },
-      logarithmic: { default: 'false', rule: rule(:bool) },
-      background_color: { default: 'f3f3f3', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      canvas_color:     { default: 'ffffff', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      font_color:   { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      frame_color:  { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      axis_color:   { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      shadea_color: { default: 'cfcfcf', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      shadeb_color: { default: '9e9e9e', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
-      border: { default: '3', rule: rule(:uint) },
-      legend: { defualt: 'true', rule: rule(:bool) },
-      notitle: { default: 'false', rule: rule(:bool) },
-      xgrid: { default: '' },
-      ygrid: { default: '' },
-      upper_limit: { default: '' },
-      lower_limit: { default: '' },
-      rigid: { default: 'false', rule: rule(:bool) },
-      sumup: { default: 'false', rule: rule(:bool) },
-      step: { rule: rule(:lambda, ->(v){v.nil? || v =~ /^\d+$/}, "invalid integer (>= 0)", ->(v){v && v.to_i}) },
-      cf: { default: 'AVERAGE', rule: rule(:choice, 'AVERAGE', 'MAX') }
-    }
+  graph_rendering_request_spec = {
+    service_name: not_specified_or_not_whitespece,
+    section_name: not_specified_or_not_whitespece,
+    graph_name: not_specified_or_not_whitespece,
+    complex: not_specified_or_not_whitespece,
+    t: { default: 'd', rule: rule(:choice, 'd', 'h', 'm', 'sh', 'sd') },
+    gmode: { default: 'gauge', rule: rule(:choice, gmode_choice()) },
+    from: {
+      default: (Time.now - 86400*8).strftime('%Y/%m/%d %T'),
+      rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
+    },
+    to: {
+      default: Time.now.strftime('%Y/%m/%d %T'),
+      rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
+    },
+    width:  { default: '390', rule: rule(:natural) },
+    height: { default: '110', rule: rule(:natural) },
+    graphonly: { default: 'false', rule: rule(:bool) },
+    logarithmic: { default: 'false', rule: rule(:bool) },
+    background_color: { default: 'f3f3f3', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    canvas_color:     { default: 'ffffff', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    font_color:   { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    frame_color:  { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    axis_color:   { default: '000000', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    shadea_color: { default: 'cfcfcf', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    shadeb_color: { default: '9e9e9e', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
+    border: { default: '3', rule: rule(:uint) },
+    legend: { defualt: 'true', rule: rule(:bool) },
+    notitle: { default: 'false', rule: rule(:bool) },
+    xgrid: { default: '' },
+    ygrid: { default: '' },
+    upper_limit: { default: '' },
+    lower_limit: { default: '' },
+    rigid: { default: 'false', rule: rule(:bool) },
+    sumup: { default: 'false', rule: rule(:bool) },
+    step: { rule: rule(:lambda, ->(v){v.nil? || v =~ /^\d+$/}, "invalid integer (>= 0)", ->(v){v && v.to_i}) },
+    cf: { default: 'AVERAGE', rule: rule(:choice, 'AVERAGE', 'MAX') }
   }
 
-  get '/complex/:method/:service_name/:section_name/:graph_name' do
-    #TODO
+  get '/complex/graph/:service_name/:section_name/:graph_name', :graph => :complex do
+    req_params = validate(params, graph_rendering_request_spec)
+
+    data = []
+    request.stash[:graph].data_rows.each do |row|
+      g = data().get_by_id(row[:graphid])
+      g.c_type = row[:type]
+      g.c_gmode = row[:gmode]
+      g.stack = row[:stack]
+      data << g
+    end
+
+    graph_img = rrd().graph(data, req_params.hash)
+    [200, {'Content-Type' => 'image/png'}, graph_img]
   end
 
-  get '/:method/:complex' do
-    #TODO
+  get '/complex/xport/:service_name/:section_name/:graph_name', :graph => :complex do
+    req_params = validate(params, graph_rendering_request_spec)
+
+    data = []
+    request.stash[:graph].data_rows.each do |row|
+      g = data().get_by_id(row[:graphid])
+      g.c_type = row[:type]
+      g.c_gmode = row[:gmode]
+      g.stack = row[:stack]
+      data << g
+    end
+
+    json(rrd().export(data, req_params.hash))
   end
 
-  get '/:method/:service_name/:section_name/:graph_name' do
-    #TODO
+  get '/graph/:service_name/:section_name/:graph_name', :graph => :simple do
+    req_params = validate(params, graph_rendering_request_spec)
+    graph_img = rrd().graph(request.stash[:graph], req_params.hash)
+    [200, {'Content-Type' => 'image/png'}, graph_img]
+  end
+
+  get '/xport/:service_name/:section_name/:graph_name', :graph => :simple do
+    req_params = validate(params, graph_rendering_request_spec)
+    json(rrd().export(request.stash[:graph], req_params.hash))
+  end
+
+  get '/graph/:complex' do
+    req_params = validate(params, graph_rendering_request_spec)
+
+    data = []
+    req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
+      g = data().get_by_id(id)
+      next unless g
+      g.c_type = type
+      g.c_gmode = gmode
+      g.stack = !!(stack =~ /^(1|true)$/i)
+      data << g
+    end
+
+    graph_img = rrd().graph(data, req_params.hash)
+    [200, {'Content-Type' => 'image/png'}, graph_img]
+  end
+
+  get '/xport/:complex' do
+    req_params = validate(params, graph_rendering_request_spec)
+
+    data = []
+    req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
+      g = data().get_by_id(id)
+      next unless g
+      g.c_type = type
+      g.c_gmode = gmode
+      g.stack = !!(stack =~ /^(1|true)$/i)
+      data << g
+    end
+
+    json(rrd().export(data, req_params.hash))
   end
 
   get '/api/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    json(graph.to_hash)
   end
 
   post '/api/:service_name/:section_name/:graph_name', :graph => :simple do
