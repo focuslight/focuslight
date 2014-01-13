@@ -105,7 +105,7 @@ module Focuslight
     def self.meta_clean(args={})
       args.delete_if do |k,v|
         %w(id service_name section_name graph_name number
-           description sort mode gmode color ulimit llimit sulimit sllimit type stype).include?(k)
+           description sort mode gmode color ulimit llimit sulimit sllimit type stype).include?(k.to_s)
       end
     end
   end
@@ -160,7 +160,7 @@ module Focuslight
 
     def self.meta_clean(args={})
       args.delete_if do |k,v|
-        %w(id service_name section_name graph_name number description sort).include?(k)
+        %w(id service_name section_name graph_name number description sort).include?(k.to_s)
       end
     end
   end
