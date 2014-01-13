@@ -129,6 +129,40 @@ describe Focuslight::Validator do
       expect(r2.error_message(:col)).to eql("col: invalid number in range 1..3")
     end
 
+    it 'returns bool predefined rule, which parse numeric 1/0 as true/false' do
+      r = Focuslight::Validator.rule(:bool)
+      expect(r.check("0")).to be_true
+      expect(r.check("1")).to be_true
+      expect(r.check("true")).to be_true
+      expect(r.check("True")).to be_true
+      expect(r.check("false")).to be_true
+      expect(r.check("nil")).to be_false
+      expect(r.check("maru")).to be_false
+      expect(r.check("")).to be_false
+
+      expect(r.format("0")).to equal(false)
+      expect(r.format("1")).to equal(true)
+      expect(r.format("true")).to equal(true)
+      expect(r.format("True")).to equal(true)
+      expect(r.format("false")).to equal(false)
+
+      expect(r.error_message(:col)).to eql("col: invalid bool value")
+    end
+
+    it 'return regexp predefined rule' do
+      r = Focuslight::Validator.rule(:regexp, /^[0-9a-f]{4}$/i)
+      expect(r.check("000")).to be_false
+      expect(r.check("0000")).to be_true
+      expect(r.check("00000")).to be_false
+      expect(r.check("a0a0")).to be_true
+      expect(r.check("FFFF")).to be_true
+
+      str = "FfFf"
+      expect(r.format(str)).to equal(str)
+
+      expect(r.error_message(:col)).to eql("col: invalid input for pattern ^[0-9a-f]{4}$")
+    end
+
     it 'returns rule instance whatever we want with "lambda" rule name' do
       r = Focuslight::Validator.rule(:lambda, ->(v){ v == 'kazeburo' }, "kazeburo only permitted", :to_sym)
       expect(r.check("kazeburo")).to be_true

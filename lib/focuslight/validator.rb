@@ -172,6 +172,10 @@ module Focuslight
         Rule.new(->(v){v =~ /^\-?(\d+\.?\d*|\.\d+)(e[+-]\d+)?$/}, "invalid floating point num", :to_f)
       when :int_range
         Rule.new(->(v){args.first.include?(v.to_i)}, "invalid number in range #{args.first}", :to_i)
+      when :bool
+        Rule.new(->(v){v =~ /^(0|1|true|false)$/i}, "invalid bool value", ->(v){!!(v =~ /^(1|true)$/i)})
+      when :regexp
+        Rule.new(->(v){v =~ args.first}, "invalid input for pattern #{args.first.source}")
       when :lambda
         Rule.new(*args)
       else
@@ -185,6 +189,10 @@ module Focuslight
       def initialize
         @errors = []
         @params = {}
+      end
+
+      def hash
+        @params.dup
       end
 
       def [](name)
