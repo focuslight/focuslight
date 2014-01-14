@@ -41,6 +41,10 @@ module Focuslight
       if spec.has_key?(:default) && value.nil?
         value = spec[:default]
       end
+      if spec[:excludable] && value.nil?
+        result[key] = nil
+        return
+      end
 
       rules = [spec[:rule]].flatten
 
@@ -69,6 +73,10 @@ module Focuslight
       if spec.has_key?(:default)
         raise ArgumentError, "array parameter cannot have :default"
       end
+      if spec[:excludable] && value.nil?
+        result[key] = []
+      end
+
       if spec.has_key?(:size) && !spec[:size].include?(values.size)
         result.error("#{key} doesn't have values specified: #{spec[:size]}")
         return
