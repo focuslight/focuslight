@@ -352,7 +352,7 @@ class Focuslight::Web < Sinatra::Base
     lower_limit: { default: '' },
     rigid: { default: 'false', rule: rule(:bool) },
     sumup: { default: 'false', rule: rule(:bool) },
-    step: { rule: rule(:lambda, ->(v){v.nil? || v =~ /^\d+$/}, "invalid integer (>= 0)", ->(v){v && v.to_i}) },
+    step: { excludable: true, rule: rule(:uint) },
     cf: { default: 'AVERAGE', rule: rule(:choice, 'AVERAGE', 'MAX') }
   }
 
@@ -432,69 +432,159 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/api/:service_name/:section_name/:graph_name', :graph => :simple do
-    json(graph.to_hash)
+    json(request.hash[:graph].to_hash)
   end
 
   post '/api/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    api_graph_post_spec = {
+      service_name: { rule: rule(:not_blank) },
+      section_name: { rule: rule(:not_blank) },
+      graph_name: { rule: rule(:not_blank) },
+      number: { rule: [ rule(:not_blank), number_type_rule() ] },
+      mode: { default: 'gauge', rule: rule(:choice, 'count', 'gauge', 'modified', 'derive') },
+      color: { default: '', rule: rule(:regexp, /^#[0-9a-f]{6}$/i) },
+      description: { default: '' },
+    }
+    req_params = validate(params, api_graph_post_spec)
+
+    if req_params.has_error?
+      halt json({ error: 1, messages: req_params.errors })
+    end
+
+    graph = nil
+    begin
+      graph = data().update(
+        req_params[:service_name], req_params[:section_name], req_params[:graph_name],
+        req_params[:number], req_params[:mode], req_params[:color]
+      )
+      unless req_params[:description].empty?
+        data().update_graph_description(graph.id, req_params[:description])
+      end
+    rescue => e
+      e.message = (
+        "%s (%s/%s/%s => %s,%s,%s)" % [
+          e.message,
+          req_params[:service_name], req_params[:section_name], req_params[:graph_name],
+          req_params[:number], req_params[:mode], req_params[:color]
+        ]
+      )
+      raise e
+    end
+    json({ error: 0, data => graph.to_hash })
   end
 
-  #TODO graph4json
-  #TODO graph4internal
+  # graph4json => Focuslight::Graph#to_hash
+  # graph4internal => Focuslight::Graph.hash2request(hash)
 
   # alias to /api/:service_name/:section_name/:graph_name
   get '/json/graph/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    json(request.stash[:graph].to_hash)
   end
 
   get '/json/complex/:service_name/:section_name/:graph_name', :graph => :complex do
-    #TODO
+    json(request.stash[:graph].to_hash)
   end
 
   # alias to /delete/:service_name/:section_name/:graph_name
   post '/json/delete/graph/:service_name/:section_name/:graph_name', :graph => :simple do
-    #TODO
+    delete(request.stash[:graph])
   end
 
   post '/json/delete/graph/:graph_id', :graph => :simple do
-    #TODO
+    delete(request.stash[:graph])
   end
 
   post '/json/delete/complex/:service_name/:section_name/:graph_name', :graph => :complex do
-    #TODO
+    delete(request.stash[:graph])
   end
 
   post '/json/delete/complex/:complex_id', :graph => :complex do
-    #TODO
+    delete(request.stash[:graph])
   end
 
   get '/json/graph/:graph_id', :graph => :simple do
-    #TODO
+    json(request.stash[:graph].to_hash)
   end
 
   get '/json/complex/:complex_id', :graph => :complex do
-    #TODO
+    json(request.stash[:graph].to_hash)
   end
 
   get '/json/list/graph' do
-    #TODO
+    json(data().get_all_graph_name()) #TODO return type?
   end
 
   get '/json/list/complex' do
-    #TODO
+    json(data().get_all_complex_graph_name()) #TODO return type?
   end
 
   get '/json/list/all' do
-    #TODO
+    json( (data().get_all_graph_all() + data().get_all_complex_graph_all()).map(:to_hash) )
   end
 
   # TODO in create/edit, validations about json object properties, sub graph id existense, ....
   post '/json/create/complex' do
-    #TODO
+    spec = JSON.parse(request.body || '{}', symbolize_names: true)
+
+    exists_simple = data().get(spec[:service_name], spec[:section_name], spec[:graph_name])
+    exists_complex = data().get_complex(spec[:service_name], spec[:section_name], spec[:graph_name])
+    if exists_simple || exists_complex
+      halt 409, "Invalid target: graph path already exists: #{spec[:service_name]}/#{spec[:section_name]}/#{spec[:graph_name]}"
+    end
+
+    if spec[:data].nil? || spec[:data].size < 2
+      halt 400, "Invalid argument: data (sub graph list (size >= 2)) required"
+    end
+
+    spec[:complex] = true
+    spec[:description] ||= ''
+    spec[:sumup] ||= false
+    spec[:sort] ||= 19
+
+    spec[:data].each do |data|
+      data[:type] ||= 'AREA'
+      data[:gmode] ||= 'gauge'
+      data[:stack] = true unless data.has_key?(:stack)
+    end
+
+    request = Focuslight::Graph.hash2request(spec)
+    data().create_complex(spec[:service_name], spec[:section_name], spec[:graph_name], request)
+
+    section_path = "/list/%s/%s" % [:service_name,:section_name].map{|s| urlencode(req_params[s])}
+    json({ error: 0, location: url_for(section_path) })
   end
 
   # post '/json/edit/{type:(?:graph|complex)}/:id' => sub {
   post '/json/edit/:type/:id' do
-    #TODO
+    graph = case params[:type]
+            when 'graph'
+              data().get_by_id( params[:id] )
+            when 'complex'
+              data().get_complex_by_id( params[:id] )
+            else
+              nil
+            end
+    unless graph
+      halt 404
+    end
+
+    spec = JSON.parse(request.body || '{}', symbolize_names: true)
+    id = spec.delete(:id) || graph.id
+
+    if spec.has_key?(:data)
+      spec[:data].each do |data|
+        data[:type] ||= 'AREA'
+        data[:gmode] ||= 'gauge'
+        data[:stack] = true unless data.has_key?(:stack)
+      end
+    end
+
+    request = Focuslight::Graph.hash2request(spec)
+    if graph.complex?
+      data().update_graph(graph.id, request)
+    else
+      data().update_complex(graph.id, request)
+    end
+    json({ error: 0 })
   end
 end
