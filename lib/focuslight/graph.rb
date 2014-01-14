@@ -46,9 +46,46 @@ module Focuslight
     def to_hash
       {
         id: @id, service_name: @service, section_name: @section, graph_name: @graph,
-        number: @number, description: @description, sort: @sort, meta: @meta,
+        number: @number, description: @description, sort: @sort,
         created_at: self.created_at(), updated_at: self.updated_at(),
       }
+    end
+
+    def self.hash2request(hash)
+      is_complex = hash.delete(:complex)
+
+      hash.delete(:id)
+      hash.delete(:created_at)
+      hash.delete(:updated_at)
+
+      return hash unless is_complex ##TODO concrete?
+
+      hash.delete(:number)
+      hash[:sumup] = (hash[:sumup] ? '1' : '0')
+
+      data_rows = hash.delete(:data)
+
+      first = data_rows.shift
+      hash['path-1'.to_sym] = first[:graph_id]
+      hash['type-1'.to_sym] = first[:type]
+      hash['gmode-1'.to_sym] = first[:gmode]
+
+      p2 = 'path-2'.to_sym
+      t2 = 'type-2'.to_sym
+      g2 = 'gmode-2'.to_sym
+      s2 = 'stack-2'.to_sym
+      hash[p2] = []
+      hash[t2] = []
+      hash[g2] = []
+      hash[s2] = []
+      data_rows.each do |row|
+        hash[p2] << row[:graph_id]
+        hash[t2] << row[:type]
+        hash[g2] << row[:gmode]
+        hash[s2] << (row[:stack] ? '1' : '0')
+      end
+
+      hash ##TODO concrete?
     end
   end
 
@@ -86,8 +123,9 @@ module Focuslight
       simple = {
         mode: @mode, gmode: @gmode, color: @color,
         ulimit: @ulimit, llimit: @llimit, sulimit: @sulimit, sllimit: @sllimit,
-        type: @type, stype: @stype, md5: @md5,
-        adjust: @adjust, adjustval: @adjustval, unit: @unit
+        type: @type, stype: @stype,
+        adjust: @adjust, adjustval: @adjustval, unit: @unit,
+        complex: false
       }
       hash = super
       hash.merge(simple)
@@ -142,10 +180,10 @@ module Focuslight
 
       first_row = {
         type: @parsed_meta['type-1'],
-        path: @parsed_meta['path-1'],
+        path: @parsed_meta['path-1'].to_i,
         gmode: @parsed_meta['gmode-1'],
         stack: false,
-        graphid: @parsed_meta['path-1'],
+        graph_id: @parsed_meta['path-1'].to_i,
       }
       data_rows << first_row
 
@@ -157,21 +195,25 @@ module Focuslight
 
       @parsed_meta['type-2'].each_with_index do |type, i|
         t = @parsed_meta['type-2'][i]
-        p = @parsed_meta['path-2'][i] # id?
+        p = @parsed_meta['path-2'][i].to_i
         g = @parsed_meta['gmode-2'][i]
         s = @parsed_meta['stack-2'][i]
         uri += ':' + [t, p, g, s].join(':')
-        data_rows << {type: t, path: p, gmode: g, stack: s, graphid: p}
+        data_rows << {type: t, path: p, gmode: g, stack: s, graph_id: p}
       end
 
-      @sumup = @parsed_meta.fetch('sump', 0)
+      @sumup = @parsed_meta.fetch('sump', false)
       @data_rows = data_rows
       @complex_graph = uri
     end
 
     def to_hash
-      # no api exists for complex graph json
-      raise NotImplementedError
+      complex = {
+        sumup: @sumup, data: @data_rows,
+        complex: true
+      }
+      hash = super
+      hash.merge(complex)
     end
 
     def complex?
