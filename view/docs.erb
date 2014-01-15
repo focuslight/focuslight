@@ -1,0 +1,139 @@
+: cascade base
+: around page_header -> {
+<div class="row">
+  <div class="col-md-12">
+    <h1>Document and Usage</h1>
+  </div>
+</div>
+: }
+
+: around content -> {
+
+<p class="alert alert-info">more details and japanese document are <a href="http://kazeburo.github.com/GrowthForecast/">here</a>.</p>
+
+<hr />
+
+<h3>How to Register Graphs</h3>
+
+<p>To create graphs or update data, make a request to the following URL via a POST method.</p>
+
+<pre>
+<: $c.req.uri_for('/') :>api/:service_name/:section_name/:graph_name
+</pre>
+
+<div class="row">
+<div class="col-md-3">
+<p>The names of the items within the URL to POST to are shown in the table to the right.</p>
+
+<p>You can use multi-byte strings for each item name as long as it is UTF-8.</p>
+</div>
+<div class="col-md-7">
+
+<table class="table">
+<tr>
+<th>The Name Used in the Example</th>
+<th>Purpose</th>
+<th>Actual Parameters</th>
+</tr>
+<tr>
+<td>:service_name</td>
+<td>The name of the service that you'd like to graph</td>
+<td>blog, photo, place, socialgame</td>
+</tr>
+<tr>
+<td>:section_name</td>
+<td>The name of the feature or system to graph, within said service.</td>
+<td>entry, user, spot, items</td>
+</tr>
+<tr>
+<td>:graph_name</td>
+<td>The actual name of the value being graphed</td>
+<td>total_entry, kakin_user, muryo_user</td>
+</tr>
+</table>
+
+</div>
+</div>
+
+<p>For example, if we are graphing the number of registered users in a social game, we would POST to the following URL:</p>
+
+<pre>
+<: $c.req.uri_for('/') :>api/socialgame/member/register
+</pre>
+
+<p>Also, we would use the following parametens when POSTing.</p>
+
+<table class="table">
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required/Optional</th>
+</tr>
+<tr>
+<td>number</td>
+<td>The number to give the graph</td>
+<td>Required</td>
+</tr>
+<tr>
+<td>mode</td>
+<td>
+
+
+
+Update method for the number: count, modified, gauge。
+
+<dl>
+<dt>count</dt>
+<dd>Add the number and update</dd>
+
+<dt>modified</dt>
+<dd>Overwritten only when the numbers different from the previous</dd>
+
+<dt>gauge</dt>
+<dd>Always overwritten by the number</dd>
+
+<dt>derive</dt>
+<dd>Always overwritten by the number. To Display figures in per seconds</dd>
+</dl>
+
+Default is "gauge"<br />
+<strong>⚠</strong>
+The data type is determined at first time. Can't change mode from DERIVE to other and other to DERIVE.
+
+</td>
+<td>Optional</td>
+</tr>
+<tr>
+<td>color</td>
+<td>The color of the grah. Specify with #FFFFFF format.</td>
+<td>Optional (auto-generated if unspecified in a new graph)</td>
+</tr>
+
+<tr>
+<td>description</td>
+<td>short description of this Graph</td>
+<td>Option</td>
+</tr>
+
+</table>
+
+<h3>Example: Creating a New Graph</h3>
+
+<p>The example below shows how to create a new graph or update an existing one, using Perl's LWP module.</p>
+
+<pre>
+my $ua = LWP::UserAgent->new;
+$ua->post('<: $c.req.uri_for('/') :>api/socialgame/member/register', {
+    number      => 10,
+    color       => '#333399'
+});
+</pre>
+
+<p>If using curl:</p>
+
+<pre>
+$ curl -F number=10 <: $c.req.uri_for('/') :>api/socialgame/member/register
+</pre>
+
+
+: }
