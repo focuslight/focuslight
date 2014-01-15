@@ -102,9 +102,9 @@ Focuslight
         <h1>
         <a href="<%= url_for '/' %>">Home</a>
         <% if pathinfo.size == 1 %> » <%= pathinfo[0] %><% end %>
-        <% if pathinfo.size >= 2 %> » <a href="<%= url_for linkpath(pathinfo, 0..0) %>"><%= pathinfo[0] %></a><% end %>
+        <% if pathinfo.size >= 2 %> » <a href="<%= url_for linkpath(pathinfo[0..0]) %>"><%= pathinfo[0] %></a><% end %>
         <% if pathinfo.size == 2 %> » <%= pathinfo[1] %><% end %>
-        <% if pathinfo.size >= 3 %> » <a href="<%= url_for linkpath(pathinfo, 0..1), term_arg %>"><%= pathinfo[1] %></a><% end %>
+        <% if pathinfo.size >= 3 %> » <a href="<%= url_for linkpath(pathinfo[0..1]), term_arg %>"><%= pathinfo[1] %></a><% end %>
         <% if pathinfo.size >= 3 %> » <%= pathinfo[2] %><% end %>
         </h1>
       </div>
