@@ -35,6 +35,10 @@ module Focuslight
       @updated_at_time = Time.at(row['updated_at'].to_i)
     end
 
+    def path
+      [@service, @section, @graph]
+    end
+
     def created_at
       @created_at_time.strftime('%Y/%m/%d %T')
     end
