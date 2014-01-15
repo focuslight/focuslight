@@ -122,6 +122,10 @@ class Focuslight::Web < Sinatra::Base
       # 12345678 => "12,345,678"
       num.to_s.reverse.chars.each_slice(3).map{|slice| slice.reverse.join}.reverse.join(',')
     end
+
+    def selected?(real, option)
+      real == option ? 'selected' : ''
+    end
   end
 
   module Stash
