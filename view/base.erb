@@ -84,8 +84,8 @@ Focuslight
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li class="<%= request.stash[:docs] ? 'active' : '' %>"><a href="<%= url_for '/' %>">Home</a></li>
-        <li class="<%= request.stash[:docs] ? 'active' : '' %>"><a href="<%= url_for '/docs' %>">Docs</a></li>
+        <li class="<%= pathinfo[4] != :docs ? '' : 'active' %>"><a href="<%= url_for '/' %>">Home</a></li>
+        <li class="<%= pathinfo[4] == :docs ? 'active' : '' %>"><a href="<%= url_for '/docs' %>">Docs</a></li>
       </ul>
     </div>
   </div>
@@ -95,10 +95,16 @@ Focuslight
 
   <div class="page-header">
 
-    <% if pathinfo.size == 5 && pathinfo[4] == :docs %>
+    <% if pathinfo[4] == :docs %>
     <div class="row">
       <div class="col-md-12">
         <h1>Document and Usage</h1>
+      </div>
+    </div>
+    <% elsif pathinfo[4] == :edit %>
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Edit Graph</h1>
       </div>
     </div>
 
