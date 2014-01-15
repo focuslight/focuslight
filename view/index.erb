@@ -1,42 +1,19 @@
-: cascade base
-: around page_title -> {
-<: if $c.args.service_name { :> <: $c.args.service_name :> | <: super :><: } :>
-: }
-
-: around page_header -> {
-<div class="row">
-  <div class="col-md-8">
-    <h1><a href="<: $c.req.uri_for('/') :>">Home</a><: if $c.args.service_name { :> » <: $c.args.service_name :><: } :></h1>
-  </div>
-  <div class="col-md-4" style="padding-top:25px;text-align:right">
-<: if ! $c.args.service_name { :>
-    <a class="btn btn-default btn-sm" id="link-fold-all" href="#">fold all</a>
-    <a class="btn btn-default btn-sm" id="link-expand-all" href="#">expand all</a>
-<: } :>
-    <a class="btn btn-default btn-sm" href="<: $c.req.uri_for('/add_complex',[service_name=>$c.args.service_name,section_name=>$c.args.section_name]) :>">add complex graph</a>
-  </div>
-</div>
-: }
-
-: around content -> {
 <div class="panel-group">
-: for $services ->  $service {
+<% services.each do |service| %>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h2 class="panel-title">
-    : if ! $c.args.service_name {
-    <a href="#service_<: $service.name :>" id="for_service_<: $service.name :>" data-toggle="collapse"><span class="glyphicon glyphicon-chevron-down" style="font-size:0.5em; vertical-align: text-middle"></span></a>
-    : }
-    <a href="<: $c.req.uri_for('/list/'~uri_escape($service.name))  :>"><: $service.name :></a>
+    <% if pathinfo.size < 1 %>
+    <a href="#service_<%= service[:name] %>" id="for_service_<%= service[:name] %>" data-toggle="collapse"><span class="glyphicon glyphicon-chevron-down" style="font-size:0.5em; vertical-align: text-middle"></span></a>
+    <% end %>
+    <a href="<%= url_for linkpath([service[:name]]) %>"><%= service[:name] %></a>
     </h2>
   </div>
-  <ul class="<: if ! $c.args.service_name { :>service_sections <: } :>list-group panel-collapse in" id="service_<: $service.name :>">
-  : for $service.sections -> $section {
-    <li class="list-group-item "><a href="<: $c.req.uri_for('/list/'~uri_escape($service.name)~'/'~uri_escape($section)) :>"><: $section :></a></li>
-  : }
+  <ul class="<%= pathinfo.size < 1 ? 'service_section ' : '' %>list-group panel-collapse in" id="service_<%= service[:name] %>">
+    <% service[:sections].each do |section| %>
+    <li class="list-group-item "><a href="<%= url_for linkpath([ service[:name], section ]) %>"><%= section %></a></li>
+    <% end %>
   </ul>
 </div>
-: }
+<% end %>
 </div>
-: } 
-
