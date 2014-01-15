@@ -114,8 +114,13 @@ class Focuslight::Web < Sinatra::Base
       p
     end
 
-    def linkpath(ary, range)
-      ['/list', range.map{|i| urlencode(ary[i])}].join('/')
+    def linkpath(ary, prefix='/list')
+      [prefix, ary.map{|v| urlencode(v)}].join('/')
+    end
+
+    def format_number(num)
+      # 12345678 => "12,345,678"
+      num.to_s.reverse.chars.each_slice(3).map{|slice| slice.reverse.join}.reverse.join(',')
     end
   end
 
