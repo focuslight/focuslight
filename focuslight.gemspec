@@ -20,12 +20,16 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rspec"
+
   spec.add_runtime_dependency "rake" #TODO: daemon execution without rake
   spec.add_runtime_dependency "dotenv"
   spec.add_runtime_dependency "foreman"
+
   spec.add_runtime_dependency "sinatra"
   spec.add_runtime_dependency "sinatra-contrib"
   spec.add_runtime_dependency "emk-sinatra-url-for"
+  spec.add_runtime_dependency "erubis"
+
   spec.add_runtime_dependency "sqlite3"
   spec.add_runtime_dependency "librrd"
   spec.add_runtime_dependency "rrd-ffi"
