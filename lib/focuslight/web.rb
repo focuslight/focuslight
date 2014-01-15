@@ -204,7 +204,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-      erb :edit, layout: :base, locals: { pathinfo: pathinfo(params), graph: request.stash[:graph] } # TODO: disable_subtract
+      erb :edit, layout: :base, locals: { pathinfo: [nil,nil,nil,nil,:edit], graph: request.stash[:graph] } # TODO: disable_subtract
   end
 
   post '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
