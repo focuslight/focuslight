@@ -1,14 +1,3 @@
-: cascade base
-: around page_header -> {
-<div class="row">
-  <div class="col-md-12">
-    <h1>Document and Usage</h1>
-  </div>
-</div>
-: }
-
-: around content -> {
-
 <p class="alert alert-info">more details and japanese document are <a href="http://kazeburo.github.com/GrowthForecast/">here</a>.</p>
 
 <hr />
@@ -18,7 +7,7 @@
 <p>To create graphs or update data, make a request to the following URL via a POST method.</p>
 
 <pre>
-<: $c.req.uri_for('/') :>api/:service_name/:section_name/:graph_name
+<%= url_for '/', :full %>api/:service_name/:section_name/:graph_name
 </pre>
 
 <div class="row">
@@ -58,7 +47,7 @@
 <p>For example, if we are graphing the number of registered users in a social game, we would POST to the following URL:</p>
 
 <pre>
-<: $c.req.uri_for('/') :>api/socialgame/member/register
+<%= url_for '/', :full %>api/socialgame/member/register
 </pre>
 
 <p>Also, we would use the following parametens when POSTing.</p>
@@ -123,7 +112,7 @@ The data type is determined at first time. Can't change mode from DERIVE to othe
 
 <pre>
 my $ua = LWP::UserAgent->new;
-$ua->post('<: $c.req.uri_for('/') :>api/socialgame/member/register', {
+$ua->post('<%= url_for '/', :full %>api/socialgame/member/register', {
     number      => 10,
     color       => '#333399'
 });
@@ -132,8 +121,5 @@ $ua->post('<: $c.req.uri_for('/') :>api/socialgame/member/register', {
 <p>If using curl:</p>
 
 <pre>
-$ curl -F number=10 <: $c.req.uri_for('/') :>api/socialgame/member/register
+$ curl -F number=10 <%= url_for '/', :full %>api/socialgame/member/register
 </pre>
-
-
-: }

@@ -94,6 +94,15 @@ Focuslight
 <div class="container">
 
   <div class="page-header">
+
+    <% if pathinfo.size == 5 && pathinfo[4] == :docs %>
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Document and Usage</h1>
+      </div>
+    </div>
+
+    <% else %>
     <div class="row">
       <% header_left_col_cls = pathinfo.size >= 3 ? "col-md-10" : "col-md-8" %>
       <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-4" %>
@@ -119,6 +128,7 @@ Focuslight
         <a class="btn btn-default btn-sm" href="<%= url_for '/add_complex', add_complex_arg) %>">add complex graph</a>
       </div>
     </div>
+    <% end %>
   </div>
 
   <div class="row">

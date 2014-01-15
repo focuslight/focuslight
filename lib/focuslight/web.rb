@@ -156,8 +156,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/docs' do
-    request.stash[:docs] = true
-    erb :docs, layout: :base, locals: { pathinfo: [] }
+    erb :docs, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :docs] }
   end
 
   get '/' do
