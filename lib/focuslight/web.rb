@@ -152,7 +152,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/docs' do
     request.stash[:docs] = true
-    erb :docs, :layout => :base, locals: { pathinfo: [] }
+    erb :docs, layout: :base, locals: { pathinfo: [] }
   end
 
   get '/' do
@@ -160,14 +160,14 @@ class Focuslight::Web < Sinatra::Base
     data().get_services.each do |service|
       services << {:name => service, :sections => data().get_sections(service)}
     end
-    erb :index, :layout => :base, locals: { pathinfo: pathinfo(params), services: services }
+    erb :index, layout: :base, locals: { pathinfo: pathinfo(params), services: services }
   end
 
   get '/list/:service_name' do
     services = []
     sections = data().get_section(params[:service_name])
     services << { name: params[:service_name], sections: sections }
-    erb :index, :layout => :base, :locals => { pathinfo: pathinfo(params), services: services }
+    erb :index, layout: :base, :locals => { pathinfo: pathinfo(params), services: services }
   end
 
   not_specified_or_not_whitespece = {
@@ -184,23 +184,23 @@ class Focuslight::Web < Sinatra::Base
     req_params = validate(params, graph_view_spec)
     graphs = data().get_graphs(req_params[:service_name], req_params[:section_name])
     pi = pathinfo(req_params.hash)
-    erb :list, :layout => :base, locals: { pathinfo: pi, params: req_params.hash, graphs: graphs }
+    erb :list, layout: :base, locals: { pathinfo: pi, params: req_params.hash, graphs: graphs }
   end
 
   get '/view_graph/:service_name/:section_name/:graph_name', :graph => :simple do
     req_params = validate(params, graph_view_spec)
     pi = pathinfo(req_params.hash)
-    erb :view_graph, :layout => :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ] }
+    erb :view_graph, layout: :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ] }
   end
 
   get '/view_complex/:service_name/:section_name/:graph_name', :graph => :complex do
     req_params = validate(params, graph_view_spec)
     pi = pathinfo(req_params.hash)
-    erb :view_graph, :layout => :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ], view_complex: true }
+    erb :view_graph, layout: :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ], view_complex: true }
   end
 
   get '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-      erb :edit, :layout => :base, locals: { pathinfo: pathinfo(params), graph: request.stash[:graph] } # TODO: disable_subtract
+      erb :edit, layout: :base, locals: { pathinfo: pathinfo(params), graph: request.stash[:graph] } # TODO: disable_subtract
   end
 
   post '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
@@ -310,7 +310,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
-    render :edit_complex, locals: {graphs: graphs} #TODO: disable_subtract
+    erb :edit_complex, layout: :base, locals: { graphs: graphs } #TODO: disable_subtract
   end
 
   post '/edit_complex/:complex_id', :graph => :complex do
