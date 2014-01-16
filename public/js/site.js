@@ -82,11 +82,11 @@ function add_new_row() {
 
   var tr = $('<tr></tr>');
   tr.append('<td><span class="table-order-pointer table-order-up">⬆</span><span class="table-order-pointer table-order-down">⬇</span></td>');
-  tr.append('<td style="text-align:left">'+$('#type-add option:selected').html()+'<input type="hidden" name="type-2" value="'+type+'" /></td>');
-  tr.append('<td>'+$('#path-add option:selected').html()+'<input type="hidden" name="path-2" value="'+path+'" /></td>');
-  tr.append('<td style="text-align:center">'+$('#gmode-add option:selected').html()+'<input type="hidden" name="gmode-2" value="'+gmode+'" /></td>');
-  tr.append('<td style="text-align:center">'+$('#stack-add option:selected').html()+'<input type="hidden" name="stack-2" value="'+stack+'" /></td>');
-  tr.append('<td style="text-align:center"><span class="table-order-remove">✖</span></td>')
+  tr.append('<td style="text-align:left">'+$('#type-add option:selected').html()+'<input type="hidden" name="type-2[]" value="'+type+'" /></td>');
+  tr.append('<td>'+$('#path-add option:selected').html()+'<input type="hidden" name="path-2[]" value="'+path+'" /></td>');
+  tr.append('<td style="text-align:center">'+$('#gmode-add option:selected').html()+'<input type="hidden" name="gmode-2[]" value="'+gmode+'" /></td>');
+  tr.append('<td style="text-align:center">'+$('#stack-add option:selected').html()+'<input type="hidden" name="stack-2[]" value="'+stack+'" /></td>');
+  tr.append('<td style="text-align:center"><span class="table-order-remove">✖</span></td>');
   tr.appendTo($('table#add-data-tbl'));
 
   $('#add-data-tbl').find('tr:last').addClass('can-table-order');
