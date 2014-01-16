@@ -1,17 +1,4 @@
-: cascade base
-: around page_header -> {
-<div class="row">
-  <div class="col-md-8">
-    <h1>Add Complex Graph</h1>
-  </div>
-</div>
-: }
-
-: around content -> {
-
-: block form |  fillinform( $c.request ) -> {
-
-<form id="complex-form" class="hxrpost form-horizontal" method="post" action="<: $c.req.uri_for('/add_complex') :>" role="form">
+<form id="complex-form" class="hxrpost form-horizontal" method="post" action="<%= url_for '/add_complex' %>" role="form">
 
 <fieldset>
 
@@ -20,11 +7,11 @@
   <div class="col-sm-8">
     <div class="input-group">
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="service_name" />
+      <input type="text" class="form-control" name="service_name" value="<%= params[:service_name] %>" />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="section_name" />
+      <input type="text" class="form-control" name="section_name" value="<%= params[:section_name] %>" />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="graph_name" />
+      <input type="text" class="form-control" name="graph_name" value="<%= params[:graph_name] %>" />
     </div>
     <p class="help-block">Graph's URI(service name/section name/graph name)</p>
   </div>
@@ -33,7 +20,7 @@
 <div class="form-group">
   <label for="" class="col-sm-3 control-label">Description</label>
   <div class="col-sm-9">
-    <input type="text" class="form-control" name="description" />
+    <input type="text" class="form-control" name="description" value="<%= params[:description] %>" />
   </div>
 </div>
 
@@ -41,8 +28,8 @@
   <label for="" class="control-label col-sm-3">Display sum up value</label>
   <div class="col-sm-4">
     <select name="sumup" class="form-control">
-    <option value="0">disable</option>
-    <option value="1">enable</option>
+    <option value="0" <%= selected?(params[:sumup], 0) %>>disable</option>
+    <option value="1" <%= selected?(params[:sumup], 1) %>>enable</option>
     </select>
   </div>
 </div>
@@ -51,26 +38,9 @@
   <label for="" class="control-label col-sm-3">Display order</label>
   <div class="col-sm-4">
     <select name="sort" class="form-control">
-    <option value="19">19</option>
-    <option value="18">18</option>
-    <option value="17">17</option>
-    <option value="16">16</option>
-    <option value="15">15</option>
-    <option value="14">14</option>
-    <option value="13">13</option>
-    <option value="12">12</option>
-    <option value="11">11</option>
-    <option value="10">10</option>
-    <option value="9">9</option>
-    <option value="8">8</option>
-    <option value="7">7</option>
-    <option value="6">6</option>
-    <option value="5">5</option>
-    <option value="4">4</option>
-    <option value="3">3</option>
-    <option value="2">2</option>
-    <option value="1">1</option>
-    <option value="0">0</option>
+    <% (0..19).map(&:to_i).reverse.each do |i| %>
+      <option value="<%= i %>" <%= selected?(params[:sort], i) %>><%= i %></option>
+    <% end %>
     </select>
     <p class="help-block">19 is top</p>
   </div>
@@ -95,18 +65,18 @@
 <tr>
 <td>&nbsp;</td>
 <td><select name="type-1" class="form-control">
-<option value="AREA">AREA</option>
-<option value="LINE1">LINE</option>
-<option value="LINE2">LINE(Bold)</option>
+<option value="AREA"  <%= selected?(params[:'type-1'], 'AREA') %>>AREA</option>
+<option value="LINE1" <%= selected?(params[:'type-1'], 'LINE1') %>>LINE</option>
+<option value="LINE2" <%= selected?(params[:'type-1'], 'LINE2') %>>LINE(Bold)</option>
 </select></td>
 <td><select name="path-1" class="form-control">
-: for $graphs -> $graph {
-<option value="<: $graph.id :>">/<: $graph.service_name :>/<: $graph.section_name :>/<: $graph.graph_name :></option>
-: }
+<% graphs.each do |graph| %>
+<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-1" class="form-control">
-<option value="gauge">Gauge</option>
-<option value="subtract">Subtract</option>
+<option value="gauge" <%= selected?(params[:'gmode-1'], 'gauge') %>>Gauge</option>
+<option value="subtract" <%= selected?(params[:'gmode-1'], 'subtract') %>>Subtract</option>
 </select></td>
 </tr>
 </table>
@@ -135,9 +105,9 @@
 <option value="LINE2">LINE(Bold)</option>
 </select></t>
 <td><select name="path-add" id="path-add" class="form-control">
-: for $graphs -> $graph {
-<option value="<: $graph.id :>">/<: $graph.service_name :>/<: $graph.section_name :>/<: $graph.graph_name :></option>
-: }
+<% graphs.each do |graph| %>
+<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
 <option value="gauge">Gauge</option>
@@ -176,10 +146,6 @@
 </div>
 
 </form>
-: }
 <br />
 <br />
-
-: }
-
 

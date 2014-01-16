@@ -1,30 +1,17 @@
-: cascade base
-: around page_header -> {
-<div class="row">
-  <div class="col-md-8">
-    <h1>Edit Complex Graph</h1>
-  </div>
-</div>
-: }
-
-
-: around content -> {
-
-<form id="complex-form" class="hxrpost form-horizontal" method="post" action="<: $c.req.uri_for('/edit_complex/'~$c.stash.complex.id) :>" role="form">
+<form id="complex-form" class="hxrpost form-horizontal" method="post" action="<%= url_for "/edit_complex/#{complex.id}" %>" role="form">
 
 <fieldset>
 
-: block form |  fillinform( $c.stash.complex ) -> {
 <div class="form-group">
   <label for="" class="control-label col-sm-3">Path</label>
   <div class="col-sm-8">
     <div class="input-group">
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="service_name" />
+      <input type="text" class="form-control" name="service_name" <%= complex.service %> />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="section_name" />
+      <input type="text" class="form-control" name="section_name" <%= complex.section %> />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="graph_name" />
+      <input type="text" class="form-control" name="graph_name" <%= complex.graph %> />
     </div>
     <p class="help-block">Graph's URI(service name/section name/graph name)</p>
   </div>
@@ -33,7 +20,7 @@
 <div class="form-group">
   <label for="" class="col-sm-3 control-label">Description</label>
   <div class="col-sm-9">
-    <input type="text" class="form-control" name="description" />
+    <input type="text" class="form-control" name="description" <%= complex.description %> />
   </div>
 </div>
 
@@ -41,8 +28,8 @@
   <label for="" class="control-label col-sm-3">Display sum up value</label>
   <div class="col-sm-4">
     <select name="sumup" class="form-control">
-    <option value="0">disable</option>
-    <option value="1">enable</option>
+    <option value="0" <%= selected?(complex.sumup, false) %>>disable</option>
+    <option value="1" <%= selected?(complex.sumup, true ) %>>enable</option>
     </select>
   </div>
 </div>
@@ -51,26 +38,9 @@
   <label for="" class="control-label col-sm-3">Display order</label>
   <div class="col-sm-4">
     <select name="sort" class="form-control">
-    <option value="19">19</option>
-    <option value="18">18</option>
-    <option value="17">17</option>
-    <option value="16">16</option>
-    <option value="15">15</option>
-    <option value="14">14</option>
-    <option value="13">13</option>
-    <option value="12">12</option>
-    <option value="11">11</option>
-    <option value="10">10</option>
-    <option value="9">9</option>
-    <option value="8">8</option>
-    <option value="7">7</option>
-    <option value="6">6</option>
-    <option value="5">5</option>
-    <option value="4">4</option>
-    <option value="3">3</option>
-    <option value="2">2</option>
-    <option value="1">1</option>
-    <option value="0">0</option>
+    <% (0..19).map(&:to_i).reverse.each do |i| %>
+      <option value="<%= i %>" <%= selected?(complex.sort, i) %>><%= i %></option>
+    <% end %>
     </select>
     <p class="help-block">19 is top</p>
   </div>
@@ -85,6 +55,8 @@
 <label for="" class="control-label col-sm-2">Series-1</label>
 <div class="col-sm-10">
 
+<% first_row = complex.data_rows.first %>
+
 <table class="table table-bordered table-striped">
 <tr>
 <th style="width: 6%;">&nbsp;</th>
@@ -95,25 +67,23 @@
 <tr>
 <td>&nbsp;</td>
 <td><select name="type-1" class="form-control">
-<option value="AREA">AREA</option>
-<option value="LINE1">LINE</option>
-<option value="LINE2">LINE(Bold)</option>
+<option value="AREA" <%= selected?(first_row[:type], 'AREA') %>>AREA</option>
+<option value="LINE1" <%= selected?(first_row[:type], 'LINE1') %>>LINE</option>
+<option value="LINE2" <%= selected?(first_row[:type], 'LINE2') %>>LINE(Bold)</option>
 </select></td>
 <td><select name="path-1" class="form-control">
-: for $graphs -> $graph {
-<option value="<: $graph.id :>">/<: $graph.service_name :>/<: $graph.section_name :>/<: $graph.graph_name :></option>
-: }
+<% graphs.each do |graph| %>
+<option value="<%= graph.id %>" <%= selected?(first_row[:path], graph.id) %>>/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-1" class="form-control">
-<option value="gauge">Gauge</option>
-<option value="subtract">Subtract</option>
+<option value="gauge" <%= selected?(first_row[:mode], 'gauge') %>>Gauge</option>
+<option value="subtract" <%= selected?(first_row[:mode], 'subtract') %>>Subtract</option>
 </select></td>
 </tr>
 </table>
 </div>
 </div>
-
-: } # fillin
 
 <div class="form-group">
 <label for="" class="control-label col-sm-2">Series-2 and more</label>
@@ -137,9 +107,9 @@
 <option value="LINE2">LINE(Bold)</option>
 </select></t>
 <td><select name="path-add" id="path-add" class="form-control">
-: for $graphs -> $graph {
-<option value="<: $graph.id :>">/<: $graph.service_name :>/<: $graph.section_name :>/<: $graph.graph_name :></option>
-: }
+<% graphs.each do |graph| %>
+<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
 <option value="gauge">Gauge</option>
@@ -153,19 +123,17 @@
 <td style="text-align:center;"><button id="add-new-row" class="btn btn-default" style="padding: 3px 14px 4px;">追加</button></td>
 </tr>
 
-: my $type_hash = { 'AREA' => 'AREA', 'LINE1' => 'LINE', 'LINE2' => 'LINE(Bold)' }
-: my $gmode_hash = { 'gauge' => 'Gauge', 'subtract' => 'Subtract' }
-: my $stack_hash = { '1' => 'enable', 'subtract' => 'disable' }
-: for $c.stash.complex.data_rows ->  $row {
+<% complex.data_rows[1..-1].each do |row| %>
 <tr class="can-table-order">
 <td><span class="table-order-pointer table-order-up">⬆</span><span class="table-order-pointer table-order-down">⬇</span></td>
-<td><: $type_hash[$row.type] :><input type="hidden" name="type-2" value="<: $row.type :>"/></td>
-<td>/<: $row.graph.service_name :>/<: $row.graph.section_name :>/<: $row.graph.graph_name :><input type="hidden" name="path-2" value="<: $row.path :>"/></td>
-<td style="text-align:center"><: $gmode_hash[$row.gmode] :><input type="hidden" name="gmode-2" value="<: $row.gmode :>" /></td>
-<td style="text-align:center"><: $stack_hash[$row.stack] :><input type="hidden" name="stack-2" value="<: $row.stack :>" /></td>
+<td><%= case row[:type] when 'AREA' then 'AREA' when 'LINE1' then 'LINE' else 'LINE(Bold)' end %><input type="hidden" name="type-2[]" value="<%= row[:type] %>"/></td>
+<% graph = dic[row[:graph_id]] %>
+<td>/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %><input type="hidden" name="path-2[]" value="<%= row[:path] %>"/></td>
+<td style="text-align:center"><%= row[:gmode] == 'gauge' ? 'Gauge' : 'Subtract' %><input type="hidden" name="gmode-2[]" value="<%= row[:gmode] %>" /></td>
+<td style="text-align:center"><%= row[:stack] ? 'enable' : 'disable' %><input type="hidden" name="stack-2[]" value="<%= row[:stack] ? 1 : 0 %>" /></td>
 <td style="text-align:center"><span class="table-order-remove">✖</span></td>
 </tr>
-: }
+<% end %>
 
 </table>
 </div>
@@ -189,14 +157,11 @@
 <div class="form-group">
   <div class="col-sm-offset-3 col-sm-9">
     <input type="submit" class="btn btn-primary" value="Submit" />
-    <a href="<: $c.req.uri_for('/list/'~uri_escape($c.stash.complex.service_name)~'/'~uri_escape($c.stash.complex.section_name)) :>" class="btn btn-default">Cancel</a>
-    <button type="button" class="btn btn-danger hxr_confirm_button" data-confirm="Remove '<: $c.stash.complex.graph_name :>'?" data-uri="<: $c.req.uri_for('/delete_complex/'~$c.stash.complex.id) :>">Remove</button>
+    <a href="<%= url_for linkpath([complex.service, complex.section]) %>" class="btn btn-default">Cancel</a>
+    <button type="button" class="btn btn-danger hxr_confirm_button" data-confirm="Remove '<%= complex.graph %>'?" data-uri="<%= url_for "/delete_complex/#{complex.id}" %>">Remove</button>
   </div>
 </div>
 
 </form>
 <br />
 <br />
-
-: }
-
