@@ -201,8 +201,8 @@ module Focuslight
         t = @parsed_meta['type-2'][i]
         p = @parsed_meta['path-2'][i].to_i
         g = @parsed_meta['gmode-2'][i]
-        s = @parsed_meta['stack-2'][i]
-        uri += ':' + [t, p, g, s].join(':')
+        s = @parsed_meta['stack-2'][i].is_a?(String) ? !!(@parsed_meta['stack-2'][i] =~ /^(1|true)$/i) : !!@parsed_meta['stack-2'][i]
+        uri += ':' + [t, p, g, (s ? '1' : '0')].join(':')
         data_rows << {type: t, path: p, gmode: g, stack: s, graph_id: p}
       end
 
