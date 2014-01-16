@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS prev_graphs (
     updated_at   UNSIGNED INT NOT NULL,
     PRIMARY KEY  (graph_id)
 )
-EOF
 SQL
 
     prev_short_graphs_create = <<"SQL"
