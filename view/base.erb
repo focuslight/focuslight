@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
-<link rel="shortcut icon" href="<%= url_for '/favicon.ico', :v => 2 %>" type="image/vnd.microsoft.icon" />
+<link rel="shortcut icon" href="<%= url_for '/favicon.ico', v: 2 %>" type="image/vnd.microsoft.icon" />
 <link rel="stylesheet" href="<%= url_for '/css/bootstrap.min.css' %>">
 <style type='text/css'>
 .modal form {
@@ -134,7 +134,7 @@ Focuslight
         <% add_complex_arg = {} %>
         <% add_complex_arg[:service_name] = pathinfo[0] if pathinfo.size >= 1 %>
         <% add_complex_arg[:section_name] = pathinfo[1] if pathinfo.size >= 2 %>
-        <a class="btn btn-default btn-sm" href="<%= url_for '/add_complex', add_complex_arg) %>">add complex graph</a>
+        <a class="btn btn-default btn-sm" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
       </div>
     </div>
     <% end %>
