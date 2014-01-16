@@ -67,7 +67,7 @@ function setHxrConfirmBtn() {
     modal.modal({
       show: true,
       backdrop: true,
-      keyboard: true,
+      keyboard: true
     });
     return false;
   });
@@ -95,7 +95,7 @@ function add_new_row() {
   $('#add-data-tbl').find('span.table-order-remove:last').click(table_order_remove);
 
   var myform = $('#path-add').parents('form').first();
-  setTimeout(function(){preview_complex_graph(myform)},10);
+  setTimeout(function(){preview_complex_graph(myform);},10);
 
   return false;
 }
@@ -108,7 +108,7 @@ function table_order_up() {
     mytr.insertBefore(prevtr);
   }
   var myform = $(this).parents('form').first();
-  setTimeout(function(){preview_complex_graph(myform)},10);
+  setTimeout(function(){preview_complex_graph(myform);},10);
   return false;
 };
 
@@ -120,7 +120,7 @@ function table_order_down() {
     mytr.insertAfter(nexttr);
   }
   var myform = $(this).parents('form').first();
-  setTimeout(function(){preview_complex_graph(myform)},0);
+  setTimeout(function(){preview_complex_graph(myform);},0);
   return false;
 };
 
@@ -128,7 +128,7 @@ function table_order_remove() {
   var btn = this;
   var mytr = $(this).parents('tr.can-table-order').first();
   var myform = $(this).parents('form').first();
-  setTimeout(function(){preview_complex_graph(myform)},10);
+  setTimeout(function(){preview_complex_graph(myform);},10);
   mytr.detach();
 };
 
@@ -155,10 +155,10 @@ function setTablePreview() {
   $('.table-order-down').click(table_order_down);
   $('.table-order-remove').click(table_order_remove);
   $('#complex-form select[name="sumup"]').change(function(){
-    setTimeout(function(){ preview_complex_graph($('#complex-form')) },10);
+    setTimeout(function(){ preview_complex_graph($('#complex-form')); },10);
   });
   $('#complex-form select[name$="-1"]').change(function(){
-    setTimeout(function(){ preview_complex_graph($('#complex-form')) },10);
+    setTimeout(function(){ preview_complex_graph($('#complex-form')); },10);
   });
   preview_complex_graph($('#complex-form'));
 }
