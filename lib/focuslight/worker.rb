@@ -1,4 +1,5 @@
 require "focuslight"
+
 require "focuslight/config"
 require "focuslight/data"
 require "focuslight/rrd"
@@ -19,17 +20,18 @@ class Focuslight::Worker
     @target = opts[:target] || :normal
     raise ArgumentError, "invalid worker target #{@target}" unless WORKER_TARGET_VALUES.include?(@target)
 
-    # @datadir = Focuslight::Config.get(:datadir)
-    #TODO: @datastore = ?
-
     @signals = []
   end
 
-  def graphs
-    #TODO: TODO: get graph objects
+  def data
+    @data ||= Focuslight::Data.new #TODO mysql support
   end
 
-  def update_next!(now)
+  def rrd
+    @rrd ||= Focuslight::RRD.new
+  end
+
+  def update_next!
     now = Time.now
     @next_time = now - ( now.to_i % @interval ) + @interval
   end
@@ -61,7 +63,7 @@ class Focuslight::Worker
         break
       end
 
-      next if Time.now < next_time
+      next if Time.now < @next_time
       update_next!
 
       if pid
@@ -70,8 +72,9 @@ class Focuslight::Worker
       end
 
       childpid = fork do
-        graphs().each do |graph|
-          update_rrd(graph_data(graph.id), :target => @target)
+        data().get_all_graph_all().each do |graph|
+          ###TODO
+          # update_rrd(graph_data(graph.id), :target => @target)
         end
       end
     end
