@@ -28,26 +28,9 @@
   <label for="" class="col-sm-3 control-label">Display order</label>
   <div class="col-sm-4">
     <select name="sort" class="form-control">
-      <option value="19" <%= selected?(graph.sort, 19) %>>19</option>
-      <option value="18" <%= selected?(graph.sort, 18) %>>18</option>
-      <option value="17" <%= selected?(graph.sort, 17) %>>17</option>
-      <option value="16" <%= selected?(graph.sort, 16) %>>16</option>
-      <option value="15" <%= selected?(graph.sort, 15) %>>15</option>
-      <option value="14" <%= selected?(graph.sort, 14) %>>14</option>
-      <option value="13" <%= selected?(graph.sort, 13) %>>13</option>
-      <option value="12" <%= selected?(graph.sort, 12) %>>12</option>
-      <option value="11" <%= selected?(graph.sort, 11) %>>11</option>
-      <option value="10" <%= selected?(graph.sort, 10) %>>10</option>
-      <option value="9" <%= selected?(graph.sort, 9) %>>9</option>
-      <option value="8" <%= selected?(graph.sort, 8) %>>8</option>
-      <option value="7" <%= selected?(graph.sort, 7) %>>7</option>
-      <option value="6" <%= selected?(graph.sort, 6) %>>6</option>
-      <option value="5" <%= selected?(graph.sort, 5) %>>5</option>
-      <option value="4" <%= selected?(graph.sort, 4) %>>4</option>
-      <option value="3" <%= selected?(graph.sort, 3) %>>3</option>
-      <option value="2" <%= selected?(graph.sort, 2) %>>2</option>
-      <option value="1" <%= selected?(graph.sort, 1) %>>1</option>
-      <option value="0" <%= selected?(graph.sort, 0) %>>0</option>
+    <% (0..19).map(&:to_i).reverse.each do |i| %>
+      <option value="<%= i %>" <%= selected?(graph.sort, i) %>><%= i %></option>
+    <% end %>
     </select>
     <p class="help-block">19 is top</p>
   </div>
