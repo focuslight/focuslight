@@ -2,6 +2,8 @@ require "focuslight"
 require "focuslight/config"
 require "focuslight/graph"
 
+require "sqlite3"
+
 class Focuslight::Data
   SQLITE_FILENAME = "gforecast.db" # comapibility with GrowthForecast
 
