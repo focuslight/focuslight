@@ -12,6 +12,7 @@ require 'dotenv/tasks'
 require "focuslight/worker"
 
 task :init => :dotenv do
+  require "focuslight/init"
   Focuslight::Init.run
 end
 
