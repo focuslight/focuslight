@@ -61,7 +61,7 @@ body {
 }
 </style>
 <title>
-<% if pathinfo.length() > 0 %>
+<% if pathinfo.length() > 0 && pathinfo.length() < 5 %>
 <%= pathinfo[0] %><%= pathinfo[1] ? " » " + pathinfo[1] : "" %><%= pathinfo[2] ? " » " + pathinfo[2] : "" %> | Focuslight
 <% else %>
 Focuslight
@@ -95,20 +95,23 @@ Focuslight
 
   <div class="page-header">
 
-    <% if pathinfo[4] == :docs %>
+    <% if pathinfo[4] %>
     <div class="row">
       <div class="col-md-12">
+        <% if pathinfo[4] == :docs %>
         <h1>Document and Usage</h1>
-      </div>
-    </div>
-    <% elsif pathinfo[4] == :edit %>
-    <div class="row">
-      <div class="col-md-12">
+        <% elsif pathinfo[4] == :edit %>
         <h1>Edit Graph</h1>
+        <% elsif pathinfo[4] == :add_complex %>
+        <h1>Add Complex Graph</h1>
+        <% elsif pathinfo[4] == :edit_complex %>
+        <h1>Edit Complex Graph</h1>
+        <% end %>
       </div>
     </div>
 
     <% else %>
+
     <div class="row">
       <% header_left_col_cls = pathinfo.size >= 3 ? "col-md-10" : "col-md-8" %>
       <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-4" %>

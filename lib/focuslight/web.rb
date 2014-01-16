@@ -261,7 +261,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/add_complex' do
     graphs = data().get_all_graph_name
-    erb :add_complex, locals: { pathinfo: pathinfo(params), graphs: graphs } #TODO: disable_subtract
+    erb :add_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :add_complex], params: params, graphs: graphs } #TODO: disable_subtract
   end
 
   complex_graph_request_spec_generator = ->(type2s_num){
@@ -318,7 +318,8 @@ class Focuslight::Web < Sinatra::Base
 
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
-    erb :edit_complex, layout: :base, locals: { graphs: graphs } #TODO: disable_subtract
+    graph_dic = Hash[ graphs.map{|g| [g.id, g]} ]
+    erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic } #TODO: disable_subtract
   end
 
   post '/edit_complex/:complex_id', :graph => :complex do
