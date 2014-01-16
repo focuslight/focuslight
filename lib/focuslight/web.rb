@@ -16,7 +16,7 @@ require "erubis"
 class Focuslight::Web < Sinatra::Base
   set :dump_errors, true
   set :public_folder, File.join(__dir__, '..', '..', 'public')
-  set :views,         File.join(__dir__, '..', '..', 'views')
+  set :views,         File.join(__dir__, '..', '..', 'view')
   set :erb, escape_html: true
 
   ### TODO: both of static method and helper method
@@ -44,6 +44,41 @@ class Focuslight::Web < Sinatra::Base
   helpers Sinatra::JSON
   helpers Sinatra::UrlForHelper
   helpers do
+    def url_for(url_fragment, mode=nil, options = nil)
+      if mode.is_a? Hash
+        options = mode
+        mode = nil
+      end
+
+      if mode.nil?
+        mode = :path_only
+      end
+
+      mode = mode.to_sym unless mode.is_a? Symbol
+      optstring = nil
+
+      if options.is_a? Hash
+        optstring = '?' + options.map { |k,v| "#{k}=#{URI.escape(v.to_s, /[^#{URI::PATTERN::UNRESERVED}]/)}" }.join('&')
+      end
+
+      case mode
+      when :path_only
+        base = request.script_name
+      when :full
+        scheme = request.scheme
+        if (scheme == 'http' && request.port == 80 ||
+            scheme == 'https' && request.port == 443)
+          port = ""
+        else
+          port = ":#{request.port}"
+        end
+        base = "#{scheme}://#{request.host}#{port}#{request.script_name}"
+      else
+        raise TypeError, "Unknown url_for mode #{mode.inspect}"
+      end
+      "#{base}#{url_fragment}#{optstring}"
+    end
+
     def urlencode(str)
       CGI.escape(str)
     end
