@@ -1,0 +1,16 @@
+<% link_path = linkpath(pathinfo[0..2], (view_complex ? '/view_complex' : '/view_graph')) %>
+<ul class="pagination pagination-sm pull-right" style="margin: 10px 0px 0px">
+  <li class="pres <%= params[:t] == 'sh' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'sh' %>">hour・8hours(1min)</a></li>
+  <li class="prev <%= params[:t] == 'sd' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'sd' %>">day・3days(1min)</a></li>
+  <li class="prev <%= params[:t] == 'h' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'h' %>">hour・halfday</a></li>
+  <li class="<%= ['h','m','sh','sd'].include?(params[:t]) ? '' : 'activate' %><a href="<%= url_for link_path %>">day・week</a></li>
+  <li class="next <%= params[:t] == 'm' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'m' %>">month・year</a></li>
+</ul>
+<div class="clearfix"></div>
+<br />
+
+<div class="panel-group">
+<% graphs.each do |graph| %>
+  <%== erb :view, layout: false, locals: { graph: graph, listing: true, current_term: params[:t] } %>
+<% end %>
+</div>
