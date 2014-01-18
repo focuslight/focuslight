@@ -9,7 +9,7 @@ require "tempfile"
 require "rrd"
 
 class Focuslight::RRD
-  def initialize(args)
+  def initialize(args={})
     @datadir = Focuslight::Config.get(:datadir)
     # rrdcached
   end
@@ -40,8 +40,8 @@ class Focuslight::RRD
     ]
   end
 
-  def path(graph, target=:long) # path_sort == path(graph, :short))
-    dst = (data == 'derive' ? 'DERIVE' : 'GAUGE')
+  def path(graph, target=:normal)
+    dst = (graph.mode == 'derive' ? 'DERIVE' : 'GAUGE')
     filepath = nil
     rrdoptions = nil
     if target == :short
@@ -52,7 +52,7 @@ class Focuslight::RRD
       rrdoptions = rrd_create_options_long(dst)
     end
     unless File.exists?(filepath)
-      ret = RRD::Wrapper.create(filepath, *rrdoptions)
+      ret = RRD::Wrapper.create(filepath, *rrdoptions.map(&:to_s))
       unless ret
         # TODO: error logging / handling
         raise "RRDtool returns error to create #{filepath}, error: #{RRD::Wrapper.error}"
@@ -61,17 +61,17 @@ class Focuslight::RRD
     filepath
   end
 
-  def update(graph, target=:long)
+  def update(graph, target=:normal)
     file = path(graph, target)
     subtract = if target == :short
-                 data.subtract_short
+                 graph.subtract_short
                else
-                 data.subtract
+                 graph.subtract
                end
     options = [
       file,
       '-t', 'num:sub',
-      '--', ['N', data.number, subtract].join(':')
+      '--', ['N', graph.number, subtract].join(':')
     ]
     ## TODO: rrdcached
     # if ( $self->{rrdcached} ) {
@@ -79,7 +79,7 @@ class Focuslight::RRD
     #   splice(@argv, 1, 2); # delete -t option
     #   unshift(@argv, '-d', $self->{rrdcached});
     # }
-    ret = RRD::Wrapper.update(*options)
+    ret = RRD::Wrapper.update(*options.map(&:to_s))
     unless ret
       raise "RRDtool returns error to update #{file}, error: #{RRD::Wrapper.error}"
     end
@@ -151,17 +151,17 @@ class Focuslight::RRD
       xgrid = 'HOUR:1:HOUR:2:HOUR:2:0:%H'
     end
 
-    return [period_title, period, period_end, xgrid]
+    return period_title, period, period_end, xgrid
   end
 
   def graph(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args['gmode']
+    a_gmode = args[:gmode]
     span = args.fetch('t', 'd')
-    from = args['from']
-    to = args['to']
-    width = args.fetch('width', 390)
-    height = args.fetch('height', 110)
+    from = args[:from]
+    to = args[:to]
+    width = args.fetch(:width, 390)
+    height = args.fetch(:height, 110)
 
     period_title, period, period_end, xgrid = calc_period(span, from, to)
 
@@ -177,32 +177,32 @@ class Focuslight::RRD
       '-a', 'PNG',
       '-l', 0, #minimum
       '-u', 2, #maximum
-      '-x', args.fetch('xgrid', xgrid),
+      '-x', args[:xgrid] || xgrid,
       '-s', period,
       '-e', period_end,
       '--slope-mode',
       '--disable-rrdtool-tag',
-      '--color', 'BACK#' + args['background_color'].upcase,
-      '--color', 'CANVAS#' + args['canvas_color'].upcase,
-      '--color', 'FONT#' + args['font_color'].upcase,
-      '--color', 'FRAME#' + args['frame_color'].upcase,
-      '--color', 'AXIS#' + args['axis_color'].upcase,
-      '--color', 'SHADEA#' + args['shadea_color'].upcase,
-      '--color', 'SHADEB#' + args['shadeb_color'].upcase,
-      '--border', args['border']
+      '--color', 'BACK#' + args[:background_color].to_s.upcase,
+      '--color', 'CANVAS#' + args[:canvas_color].to_s.upcase,
+      '--color', 'FONT#' + args[:font_color].to_s.upcase,
+      '--color', 'FRAME#' + args[:frame_color].to_s.upcase,
+      '--color', 'AXIS#' + args[:axis_color].to_s.upcase,
+      '--color', 'SHADEA#' + args[:shadea_color].to_s.upcase,
+      '--color', 'SHADEB#' + args[:shadeb_color].to_s.upcase,
+      '--border', args[:border].to_s.upcase
     ]
-    rrdoptions.push('-y', args['ygrid']) if args['ygrid']
-    rrdoptions.push('-t', period_title.to_s.dup) unless args['notitle']
-    rrdoptions.push('--no-legend') unless args['legend']
-    rrdoptions.push('--only-graph') if args['graphonly']
-    rrdoptions.push('--logarithmic') if args['logarithmic']
+    rrdoptions.push('-y', args[:ygrid]) if args[:ygrid]
+    rrdoptions.push('-t', period_title.to_s.dup) unless args[:notitle]
+    rrdoptions.push('--no-legend') unless args[:legend]
+    rrdoptions.push('--only-graph') if args[:graphonly]
+    rrdoptions.push('--logarithmic') if args[:logarithmic]
 
     rrdoptions.push('--font', "AXIS:8:")
     rrdoptions.push('--font', "LEGEND:8:")
 
-    rrdoptions.push('-u', args['upper_limit']) if args['upper_limit']
-    rrdoptions.push('-l', args['lower_limit']) if args['lower_limit']
-    rrdoptions.push('-r') if args['rigid']
+    rrdoptions.push('-u', args[:upper_limit]) if args[:upper_limit]
+    rrdoptions.push('-l', args[:lower_limit]) if args[:lower_limit]
+    rrdoptions.push('-r') if args[:rigid]
 
     defs = []
     datas.each_with_index do |data, i|
@@ -213,7 +213,7 @@ class Focuslight::RRD
       ulimit = (gmode == 'subtract' ? data.sulimit : data.ulimit)
       stack = (data.stack && i > 0 ? ':STACK' : '')
       file = (span =~ /^s/ ? path(data, :short) : path(data, :long))
-      unit = data.unit.gsub('%', '%%')
+      unit = (data.unit || '').gsub('%', '%%')
 
       rrdoptions.push(
         'DEF:%s%dt=%s:%s:AVERAGE' % [gdata, i, file, gdata],
@@ -235,7 +235,7 @@ class Focuslight::RRD
       defs << ('%s%d' % [gdata, i])
     end
 
-    if args['sumup']
+    if args[:sumup]
       sumup = [ defs.shift ]
       unit = datas.first.unit.gsub('%', '%%')
       defs.each do |d|
@@ -259,7 +259,7 @@ class Focuslight::RRD
       )
     end
 
-    ret = RRD::Wrapper.graph(*rrdoptions)
+    ret = RRD::Wrapper.graph(*rrdoptions.map(&:to_s))
     unless ret
       tmpfile.close!
       raise "RRDtool returns error to draw graph, error: #{RRD::Wrapper.error}"
@@ -270,17 +270,55 @@ class Focuslight::RRD
 
     graph_img = IO.binread(tmpfile.path); # read as binary
     tmpfile.delete
+
+    [
+      "/var/folders/tl/xtb7dnc132nggd6hs83y58h40000gq/T/20140117-86285-1igjvvh.png",
+      "-w", 390,
+      "-h", 110,
+      "-a", "PNG",
+      "-l", 0,
+      "-u", 2,
+      "-x", "HOUR:1:HOUR:2:HOUR:2:0:%H",
+      "-s", -118800,
+      "-e", "now",
+      "--slope-mode",
+      "--disable-rrdtool-tag",
+      "--color", "BACK#F3F3F3", "--color", "CANVAS#FFFFFF", "--color", "FONT#000000",
+      "--color", "FRAME#000000", "--color", "AXIS#000000", "--color", "SHADEA#CFCFCF",
+      "--color", "SHADEB#9E9E9E",
+      "--border", "3",
+      "-t", "Day (1min avg)",
+      "--no-legend",
+      "--font", "AXIS:8:",
+      "--font", "LEGEND:8:",
+      "DEF:num0t=./data/c4ca4238a0b923820dcc509a6f75849b.rrd:num:AVERAGE",
+      "CDEF:num0=num0t,-1000000000.0,1.0e+15,LIMIT,1,*",
+      "AREA:num0:one",
+      "GPRINT:num0:LAST:Cur\\: %4.1lf%s",
+      "GPRINT:num0:AVERAGE:Avg\\: %4.1lf%s",
+      "GPRINT:num0:MAX:Max\\: %4.1lf%s",
+      "GPRINT:num0:MIN:Min\\: %4.1lf%s\\l",
+      "VDEF:num0cur=num0,LAST",
+      "PRINT:num0cur:%.8lf",
+      "VDEF:num0avg=num0,AVERAGE",
+      "PRINT:num0avg:%.8lf",
+      "VDEF:num0max=num0,MAXIMUM",
+      "PRINT:num0max:%.8lf",
+      "VDEF:num0min=num0,MINIMUM",
+      "PRINT:num0min:%.8lf"
+    ]
+
     graph_img
   end
 
   def export(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args['gmode']
-    span = args.fetch('t', 'd')
-    from = args['from']
-    to = args['to']
-    width = args.fetch('width', 390)
-    cf = args['cf']
+    a_gmode = args[:gmode]
+    span = args.fetch(:t, 'd')
+    from = args[:from]
+    to = args[:to]
+    width = args.fetch(:width, 390)
+    cf = args[:cf]
 
     period_title, period, period_end, xgrid = calc_period(span, from, to)
 
@@ -290,7 +328,7 @@ class Focuslight::RRD
       '-e', period_end
     ]
 
-    rrdoptions.push('--step', args['step']) if args['step']
+    rrdoptions.push('--step', args[:step]) if args[:step]
 
     defs = []
     datas.each_with_index do |data, i|
@@ -310,7 +348,7 @@ class Focuslight::RRD
       defs << ('%s%d' % [gdata, i])
     end
 
-    if args['sumup']
+    if args[:sumup]
       sumup = [ defs.shift ]
       defs.each do |d|
         sumup.push(d, '+')
@@ -321,7 +359,7 @@ class Focuslight::RRD
       )
     end
 
-    ret = RRD::Wrapper.xport(*rrdoptions)
+    ret = RRD::Wrapper.xport(*rrdoptions.map(&:to_s))
     unless ret
       raise "RRDtool returns error to xport, error: #{RRD::Wrapper.error}"
     end

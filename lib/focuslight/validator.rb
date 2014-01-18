@@ -46,7 +46,7 @@ module Focuslight
         return
       end
 
-      rules = [spec[:rule]].flatten
+      rules = [spec[:rule]].flatten.compact
 
       errors = []
       valid = true

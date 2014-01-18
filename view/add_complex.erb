@@ -70,8 +70,8 @@
 <option value="LINE2" <%= selected?(params[:'type-1'], 'LINE2') %>>LINE(Bold)</option>
 </select></td>
 <td><select name="path-1" class="form-control">
-<% graphs.each do |graph| %>
-<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% graphs.each do |row| %>
+<option value="<%= row['id'] %>">/<%= row['service_name'] %>/<%= row['section_name'] %>/<%= row['graph_name'] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-1" class="form-control">
@@ -105,8 +105,8 @@
 <option value="LINE2">LINE(Bold)</option>
 </select></t>
 <td><select name="path-add" id="path-add" class="form-control">
-<% graphs.each do |graph| %>
-<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<% graphs.each do |row| %>
+<option value="<%= row['id'] %>">/<%= row['service_name'] %>/<%= row['section_name'] %>/<%= row['graph_name'] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">

@@ -48,8 +48,7 @@ class Focuslight::Worker
     while sleep(0.5) do
       if childpid
         begin
-          pid = waitpid(childpid, Process::WNOHANG)
-          if pid
+          if Process.waitpid(childpid, Process::WNOHANG)
             #TODO: $? (Process::Status object)
             childpid = nil
           end
@@ -66,15 +65,15 @@ class Focuslight::Worker
       next if Time.now < @next_time
       update_next!
 
-      if pid
+      if childpid
         # TODO: previous radar exists, skip
         next
       end
 
       childpid = fork do
+        # TODO: disable subtract
         data().get_all_graph_all().each do |graph|
-          ###TODO
-          # update_rrd(graph_data(graph.id), :target => @target)
+          rrd().update(graph, @target)
         end
       end
     end

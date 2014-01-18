@@ -42,14 +42,14 @@ class Focuslight::Data
   end
 
   def get_by_id(id)
-    rows = @db.get_first_row(
+    data = @db.get_first_row(
       'SELECT * FROM graphs WHERE id = ?',
       [id]
     )
     data && Focuslight::Graph.concrete(data)
   end
 
-  def get_by_id_for_rrdupdate(id, target=:long) # get_by_id_for_rrdupdate_short == get_by_id_for_rrdupdate(id, :short)
+  def get_by_id_for_rrdupdate(id, target=:normal) # get_by_id_for_rrdupdate_short == get_by_id_for_rrdupdate(id, :short)
     tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
 
     data = @db.get_first_row(
@@ -241,7 +241,7 @@ SQL
   end
 
   def create_complex(service, section, graph, args)
-    meta = JSON.stringify(Focuslight::ComplexGraph.meta_clean(args))
+    meta = Focuslight::ComplexGraph.meta_clean(args).to_json
     now = Time.now.to_i
     sql = <<SQL
 INSERT INTO complex_graphs (service_name, section_name, graph_name, description, sort, meta,  created_at, updated_at)

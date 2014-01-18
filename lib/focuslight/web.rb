@@ -10,7 +10,6 @@ require "cgi"
 
 require "sinatra/base"
 require "sinatra/json"
-require "sinatra/url_for"
 require "erubis"
 
 class Focuslight::Web < Sinatra::Base
@@ -42,7 +41,6 @@ class Focuslight::Web < Sinatra::Base
   end
 
   helpers Sinatra::JSON
-  helpers Sinatra::UrlForHelper
   helpers do
     def url_for(url_fragment, mode=nil, options = nil)
       if mode.is_a? Hash
@@ -165,7 +163,7 @@ class Focuslight::Web < Sinatra::Base
 
   module Stash
     def stash
-      @stash ||= []
+      @stash ||= {}
     end
   end
 
@@ -208,7 +206,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/list/:service_name' do
     services = []
-    sections = data().get_section(params[:service_name])
+    sections = data().get_sections(params[:service_name])
     services << { name: params[:service_name], sections: sections }
     erb :index, layout: :base, :locals => { pathinfo: pathinfo(params), services: services }
   end
@@ -233,7 +231,7 @@ class Focuslight::Web < Sinatra::Base
   get '/view_graph/:service_name/:section_name/:graph_name', :graph => :simple do
     req_params = validate(params, graph_view_spec)
     pi = pathinfo(req_params.hash)
-    erb :view_graph, layout: :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ] }
+    erb :view_graph, layout: :base, locals: { pathinfo: pi, params: req_params.hash, graphs: [ request.stash[:graph] ], view_complex: false }
   end
 
   get '/view_complex/:service_name/:section_name/:graph_name', :graph => :complex do
@@ -265,7 +263,7 @@ class Focuslight::Web < Sinatra::Base
       sllimit: { rule: [ rule(:not_blank), number_type_rule() ] },
       sulimit: { rule: [ rule(:not_blank), number_type_rule() ] },
     }
-    req_params = validator(params, edit_graph_spec)
+    req_params = validate(params, edit_graph_spec)
 
     if req_params.has_error?
       json({error: 1, messages: req_params.errors})
@@ -505,14 +503,14 @@ class Focuslight::Web < Sinatra::Base
     json(request.hash[:graph].to_hash)
   end
 
-  post '/api/:service_name/:section_name/:graph_name', :graph => :simple do
+  post '/api/:service_name/:section_name/:graph_name' do
     api_graph_post_spec = {
       service_name: { rule: rule(:not_blank) },
       section_name: { rule: rule(:not_blank) },
       graph_name: { rule: rule(:not_blank) },
       number: { rule: [ rule(:not_blank), number_type_rule() ] },
       mode: { default: 'gauge', rule: rule(:choice, 'count', 'gauge', 'modified', 'derive') },
-      color: { default: '', rule: rule(:regexp, /^#[0-9a-f]{6}$/i) },
+      color: { default: '', rule: rule(:regexp, /^(|#[0-9a-f]{6})$/i) },
       description: { default: '' },
     }
     req_params = validate(params, api_graph_post_spec)
@@ -522,23 +520,12 @@ class Focuslight::Web < Sinatra::Base
     end
 
     graph = nil
-    begin
-      graph = data().update(
-        req_params[:service_name], req_params[:section_name], req_params[:graph_name],
-        req_params[:number], req_params[:mode], req_params[:color]
-      )
-      unless req_params[:description].empty?
-        data().update_graph_description(graph.id, req_params[:description])
-      end
-    rescue => e
-      e.message = (
-        "%s (%s/%s/%s => %s,%s,%s)" % [
-          e.message,
-          req_params[:service_name], req_params[:section_name], req_params[:graph_name],
-          req_params[:number], req_params[:mode], req_params[:color]
-        ]
-      )
-      raise e
+    graph = data().update(
+      req_params[:service_name], req_params[:section_name], req_params[:graph_name],
+      req_params[:number], req_params[:mode], req_params[:color]
+    )
+    unless req_params[:description].empty?
+      data().update_graph_description(graph.id, req_params[:description])
     end
     json({ error: 0, data => graph.to_hash })
   end

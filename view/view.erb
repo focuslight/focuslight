@@ -5,7 +5,7 @@
     <a href="#graph_<%= graph.complex? ? 'complex_' : '' %><%= graph.id %>" id="for_graph_<%= graph.complex? ? 'complex_' : '' %><%= graph.id %>" data-toggle="collapse"><span class="glyphicon glyphicon-chevron-down" style="font-size:0.5em; vertical-align: text-middle"></span></a>
     <% end %>
     <% view_prefix = graph.complex? ? '/view_complex' : '/view_graph' %>
-    <a href="<%= url_for linkpath(graph.path, view_prefix), term_arg %>" data-id="<%= graph.id %>"><%= graph.graph %></a>
+    <a href="<%= url_for linkpath(graph.path, view_prefix), { t: current_term } %>" data-id="<%= graph.id %>"><%= graph.graph %></a>
     <small style="font-size:0.8em"><%= graph.description %></small>
     </h2>
   </div>
@@ -33,11 +33,11 @@
         <td><img src="<%= url_for("/graph/#{graph.complex_graph}", t: terms[1], sumup: (graph.sumup ? '1' : '0')) %>" class="graph" /></td>
       </tr>
     <% else %>
-      <% gmodes = case graph.gmode when 'both' then ['gauge','subtract'] when 'gauge' then 'gauge' else 'subtract' end %>
+      <% gmodes = case graph.gmode when 'both' then ['gauge','subtract'] when 'gauge' then ['gauge'] else ['subtract'] end %>
       <% gmodes.each do |gmode| %>
       <tr>
-        <td><img src="<%= url_for linkpath(graph.path, '/graph'), t: term[0], gmode: gmode %>" class="graph" /></td>
-        <td><img src="<%= url_for linkpath(graph.path, '/graph'), t: term[1], gmode: gmode %>" class="graph" /></td>
+        <td><img src="<%= url_for linkpath(graph.path, '/graph'), t: terms[0], gmode: gmode %>" class="graph" /></td>
+        <td><img src="<%= url_for linkpath(graph.path, '/graph'), t: terms[1], gmode: gmode %>" class="graph" /></td>
       </tr>
       <% end %>
     <% end %>

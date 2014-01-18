@@ -1,5 +1,7 @@
 require "focuslight"
+
 require "digest"
+require "json"
 
 module Focuslight
   class Graph
@@ -116,7 +118,7 @@ module Focuslight
       @type = row['type'] || 'AREA'
       @stype = row['stype'] || 'AREA'
 
-      @md5 = Digest::MD5.hex_digest(@id.to_s)
+      @md5 = Digest::MD5.hexdigest(@id.to_s)
 
       @adjust = @parsed_meta.fetch('adjust', '*')
       @adjustval = @parsed_meta.fetch('adjustval', '1')
@@ -160,7 +162,7 @@ module Focuslight
         end
       end
       @parsed_meta = self.class.meta_clean(@parsed_meta.merge(meta))
-      @meta = JSON.stringify(@parsed_meta)
+      @meta = @parsed_meta.to_json
     end
 
     def self.meta_clean(args={})
@@ -236,7 +238,7 @@ module Focuslight
         end
       end
       @parsed_meta = self.class.meta_clean(@parsed_meta.merge(meta))
-      @meta = JSON.stringify(@parsed_meta)
+      @meta = @parsed_meta.to_json
     end
 
     def self.meta_clean(args={})

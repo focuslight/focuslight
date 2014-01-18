@@ -13,7 +13,7 @@
 <div class="panel-group">
   <% graphs.each do |graph| %>
   <%# : my $index = $~graph.index; %> <!-- index? -->
-  <%== erb :view, layout: false, locals: { graph: graph, listing: true, current_term: params[:t], term_arg: term_arg } %>
+  <%== erb :view, layout: false, locals: { graph: graph, listing: true, current_term: params[:t] } %>
   <% end %>
 </div>
 
