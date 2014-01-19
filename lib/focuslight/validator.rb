@@ -36,8 +36,10 @@ module Focuslight
       result
     end
 
-    def self.validate_single(result, params, key, spec)
-      value = params[key.to_sym]
+    def self.validate_single(result, params, key_arg, spec)
+      key = key_arg.to_sym
+
+      value = params[key]
       if spec.has_key?(:default) && value.nil?
         value = spec[:default]
       end
@@ -68,8 +70,10 @@ module Focuslight
       end
     end
 
-    def self.validate_array(result, params, key, spec)
-      values = params[key.to_sym]
+    def self.validate_array(result, params, key_arg, spec)
+      key = key_arg.to_sym
+
+      values = params[key]
       if spec.has_key?(:default)
         raise ArgumentError, "array parameter cannot have :default"
       end
@@ -86,7 +90,7 @@ module Focuslight
         values = [values]
       end
 
-      rules = [spec[:rule]].flatten
+      rules = [spec[:rule]].flatten.compact
 
       error_values = []
       valid = true
@@ -120,7 +124,7 @@ module Focuslight
         raise ArgumentError, "multi key validation spec cannot have :default"
       end
 
-      rules = [spec[:rule]].flatten
+      rules = [spec[:rule]].flatten.compact
       errors = []
       valid = true
 
