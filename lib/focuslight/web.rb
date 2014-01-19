@@ -269,7 +269,7 @@ class Focuslight::Web < Sinatra::Base
       json({error: 1, messages: req_params.errors})
     else
       data().update_graph(request.stash[:graph].id, req_params.hash)
-      edit_path = "/list/%s/%s/%s" % [:service_name,:section_name,:graph_name].map{|s| urlencode(req_params[s])}
+      edit_path = "/view_graph/%s/%s/%s" % [:service_name,:section_name,:graph_name].map{|s| urlencode(req_params[s])}
       json({error: 0, location: url_for(edit_path)})
     end
   end
