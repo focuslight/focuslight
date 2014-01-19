@@ -123,6 +123,8 @@ module Focuslight
       @adjust = @parsed_meta.fetch('adjust', '*')
       @adjustval = @parsed_meta.fetch('adjustval', '1')
       @unit = @parsed_meta.fetch('unit', '')
+
+      @subtract = @subtract_short = nil
     end
 
     def to_hash
