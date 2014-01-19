@@ -50,7 +50,7 @@ module Focuslight
 
       errors = []
       valid = true
-      formatted = nil
+      formatted = value
 
       rules.each do |rule|
         if rule.check(value)
