@@ -412,7 +412,7 @@ class Focuslight::Web < Sinatra::Base
     shadea_color: { default: 'cfcfcf', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
     shadeb_color: { default: '9e9e9e', rule: rule(:regexp, /^[0-9a-f]{6}([0-9a-f]{2})?$/i) },
     border: { default: '3', rule: rule(:uint) },
-    legend: { defualt: 'true', rule: rule(:bool) },
+    legend: { default: 'true', rule: rule(:bool) },
     notitle: { default: 'false', rule: rule(:bool) },
     xgrid: { default: '' },
     ygrid: { default: '' },
