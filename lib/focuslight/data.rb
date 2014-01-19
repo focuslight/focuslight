@@ -50,8 +50,6 @@ class Focuslight::Data
   end
 
   def get_by_id_for_rrdupdate(id, target=:normal) # get_by_id_for_rrdupdate_short == get_by_id_for_rrdupdate(id, :short)
-    tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
-
     data = @db.get_first_row(
       'SELECT * FROM graphs WHERE id = ?',
       [id]
@@ -62,6 +60,8 @@ class Focuslight::Data
     subtract = nil
 
     @db.transaction(:immediate) do |db|
+      tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
+
       prev = db.get_first_row(
         "SELECT * FROM #{tablename} WHERE graph_id = ?", # TODO: if mysql, ' FOR UPDATE'
         [id]
@@ -70,21 +70,21 @@ class Focuslight::Data
       if !prev
         subtract = 'U'
         db.execute(
-          'INSERT INTO #{tablename} (graph_id, number, subtract, updated_at) VALUES (?,?,?,?)',
+          "INSERT INTO #{tablename} (graph_id, number, subtract, updated_at) VALUES (?,?,?,?)",
           [id, graph.number, nil, graph.updated_at_time.to_i]
         )
       elsif graph.updated_at_time.to_i != prev['updated_at']
-        subtract = graph.number - prev['number'].to_i
+        subtract = (graph.number - prev['number'].to_i).to_s
         db.execute(
-          'UPDATE #{tablename} SET number=?, subtract=?, updated_at=? WHERE graph_id = ?',
+          "UPDATE #{tablename} SET number=?, subtract=?, updated_at=? WHERE graph_id = ?",
           [graph.number, subtract, graph.updated_at_time.to_i, graph.id]
         )
       else
-        if data.mode == 'gauge' || data.mode == 'modified'
-          subtract = prev['subtract']
+        if graph.mode == 'gauge' || graph.mode == 'modified'
+          subtract = prev['subtract'] && prev['subtract'].to_s
           subtract = 'U' unless subtract
         else
-          subtract = 0
+          subtract = '0'
         end
       end
     end # commit
