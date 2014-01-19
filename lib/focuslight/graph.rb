@@ -31,7 +31,7 @@ module Focuslight
       @sort = row['sort'].to_i # NOT NULL DEFAULT 0
 
       @meta = row['meta']
-      @parsed_meta = JSON.parse(@meta || '{}')
+      @parsed_meta = JSON.parse(@meta || '{}', :symbolize_names => true)
 
       @created_at_time = Time.at(row['created_at'].to_i)
       @updated_at_time = Time.at(row['updated_at'].to_i)
@@ -120,9 +120,9 @@ module Focuslight
 
       @md5 = Digest::MD5.hexdigest(@id.to_s)
 
-      @adjust = @parsed_meta.fetch('adjust', '*')
-      @adjustval = @parsed_meta.fetch('adjustval', '1')
-      @unit = @parsed_meta.fetch('unit', '')
+      @adjust = @parsed_meta.fetch(:adjust, '*')
+      @adjustval = @parsed_meta.fetch(:adjustval, '1')
+      @unit = @parsed_meta.fetch(:unit, '')
 
       @subtract = @subtract_short = nil
     end
@@ -146,21 +146,21 @@ module Focuslight
     def update(args={})
       meta = @parsed_meta.dup
       args.each do |k, v|
-        case k
-        when 'number' then @number = v
-        when 'description' then @description = v
-        when 'sort' then @sort = v
-        when 'mode' then @mode = v
-        when 'gmode' then @gmode = v
-        when 'color' then @color = v
-        when 'ulimit' then @ulimit = v
-        when 'llimit' then @llimit = v
-        when 'sulimit' then @sulimit = v
-        when 'sllimit' then @sllimit = v
-        when 'type' then @type = v
-        when 'stype' then @stype = v
+        case k.to_sym
+        when :number then @number = v
+        when :description then @description = v
+        when :sort then @sort = v
+        when :mode then @mode = v
+        when :gmode then @gmode = v
+        when :color then @color = v
+        when :ulimit then @ulimit = v
+        when :llimit then @llimit = v
+        when :sulimit then @sulimit = v
+        when :sllimit then @sllimit = v
+        when :type then @type = v
+        when :stype then @stype = v
         else
-          meta[k] = v
+          meta[k.to_sym] = v
         end
       end
       @parsed_meta = self.class.meta_clean(@parsed_meta.merge(meta))
@@ -182,35 +182,35 @@ module Focuslight
     def initialize(row)
       super
 
-      uri = ['type-1', 'path-1', 'gmode-1'].map{|k| @parsed_meta[k]}.join(':') + ':0' # stack
+      uri = [:'type-1', :'path-1', :'gmode-1'].map{|k| @parsed_meta[k]}.join(':') + ':0' # stack
 
       data_rows = []
 
       first_row = {
-        type: @parsed_meta['type-1'],
-        path: @parsed_meta['path-1'].to_i,
-        gmode: @parsed_meta['gmode-1'],
+        type: @parsed_meta[:'type-1'],
+        path: @parsed_meta[:'path-1'].to_i,
+        gmode: @parsed_meta[:'gmode-1'],
         stack: false,
-        graph_id: @parsed_meta['path-1'].to_i,
+        graph_id: @parsed_meta[:'path-1'].to_i,
       }
       data_rows << first_row
 
-      unless @parsed_meta['type-2'].is_a?(Array)
-        ['type-2', 'path-2', 'gmode-2', 'stack-2'].each do |key|
+      unless @parsed_meta[:'type-2'].is_a?(Array)
+        [:'type-2', :'path-2', :'gmode-2', :'stack-2'].each do |key|
           @parsed_meta[key] = [@parsed_meta[key]].flatten
         end
       end
 
-      @parsed_meta['type-2'].each_with_index do |type, i|
-        t = @parsed_meta['type-2'][i]
-        p = @parsed_meta['path-2'][i].to_i
-        g = @parsed_meta['gmode-2'][i]
-        s = @parsed_meta['stack-2'][i].is_a?(String) ? !!(@parsed_meta['stack-2'][i] =~ /^(1|true)$/i) : !!@parsed_meta['stack-2'][i]
+      @parsed_meta[:'type-2'].each_with_index do |type, i|
+        t = @parsed_meta[:'type-2'][i]
+        p = @parsed_meta[:'path-2'][i].to_i
+        g = @parsed_meta[:'gmode-2'][i]
+        s = @parsed_meta[:'stack-2'][i].is_a?(String) ? !!(@parsed_meta[:'stack-2'][i] =~ /^(1|true)$/i) : !!@parsed_meta[:'stack-2'][i]
         uri += ':' + [t, p, g, (s ? '1' : '0')].join(':')
         data_rows << {type: t, path: p, gmode: g, stack: s, graph_id: p}
       end
 
-      @sumup = @parsed_meta.fetch('sump', '0') != '0' # '0' is false
+      @sumup = @parsed_meta.fetch(:sump, '0') != '0' # '0' is false
       @data_rows = data_rows
       @complex_graph = uri
     end
@@ -231,12 +231,12 @@ module Focuslight
     def update(args={})
       meta = @parsed_meta.dup
       args.each do |k, v|
-        case k
-        when 'number' then @number = v
-        when 'description' then @description = v
-        when 'sort' then @sort = v
+        case k.to_sym
+        when :number then @number = v
+        when :description then @description = v
+        when :sort then @sort = v
         else
-          meta[k] = v
+          meta[k.to_sym] = v
         end
       end
       @parsed_meta = self.class.meta_clean(@parsed_meta.merge(meta))
