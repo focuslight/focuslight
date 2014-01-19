@@ -117,7 +117,7 @@ class Focuslight::Data
           )
         end
       else
-        color ||= '#' + ['33', '66', '99', 'cc'].shuffle.slice(0,3).join
+        color = '#' + ['33', '66', '99', 'cc'].shuffle.slice(0,3).join if color.empty?
         # COLUMNS = %w(service_name section_name graph_name number mode color llimit sllimit created_at updated_at)
         columns = Focuslight::SimpleGraph::COLUMNS.join(',')
         # PLACEHOLDERS = COLUMNS.map{|c| '?'}
