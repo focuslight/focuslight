@@ -97,11 +97,12 @@ class Focuslight::Data
     graph
   end
 
-  def update(service, section, graph, number, mode, color)
+  def update(service_name, section_name, graph_name, number, mode, color)
+    data = nil
     @db.transaction do |db|
       data = db.get_first_row(
         'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?', # TODO: if mysql, ' FOR UPDATE'
-        [service, section, graph]
+        [service_name, section_name, graph_name]
       )
       if data
         graph = Focuslight::Graph.concrete(data)
@@ -124,13 +125,13 @@ class Focuslight::Data
         current_time = Time.now.to_i
         db.execute(
           "INSERT INTO graphs (#{columns}) VALUES (#{placeholders})",
-          [service, section, graph, number, mode, color, -1000000000, -100000 , current_time, current_time]
+          [service_name, section_name, graph_name, number, mode, color, -1000000000, -100000 , current_time, current_time]
         )
       end
 
       data = db.get_first_row(
         'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?',
-        [service, section, graph]
+        [service_name, section_name, graph_name]
       )
     end # transaction
 
