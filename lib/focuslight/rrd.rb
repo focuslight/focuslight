@@ -146,7 +146,7 @@ class Focuslight::RRD
       period = -1 * 4 * 60 * 60
       xgrid = 'MINUTE:30:HOUR:1:MINUTE:30:0:%H:%M'
     else # 'd' or 'sd' ?
-      period_title = (span == 'sd' ? 'Day (5min avg)' : 'Day (1min avg)')
+      period_title = (span == 'sd' ? 'Day (1min avg)' : 'Day (5min avg)')
       period = -1 * 60 * 60 * 33 # 33 hours
       xgrid = 'HOUR:1:HOUR:2:HOUR:2:0:%H'
     end
@@ -177,7 +177,7 @@ class Focuslight::RRD
       '-a', 'PNG',
       '-l', 0, #minimum
       '-u', 2, #maximum
-      '-x', args[:xgrid] || xgrid,
+      '-x', (args[:xgrid].empty? ? xgrid : args[:xgrid]),
       '-s', period,
       '-e', period_end,
       '--slope-mode',
@@ -191,7 +191,7 @@ class Focuslight::RRD
       '--color', 'SHADEB#' + args[:shadeb_color].to_s.upcase,
       '--border', args[:border].to_s.upcase
     ]
-    rrdoptions.push('-y', args[:ygrid]) if args[:ygrid]
+    rrdoptions.push('-y', args[:ygrid]) unless args[:ygrid].empty?
     rrdoptions.push('-t', period_title.to_s.dup) unless args[:notitle]
     rrdoptions.push('--no-legend') unless args[:legend]
     rrdoptions.push('--only-graph') if args[:graphonly]
