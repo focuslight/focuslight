@@ -170,6 +170,7 @@ class Focuslight::RRD
     end
 
     tmpfile = Tempfile.new(["", ".png"]) # [basename_prefix, suffix]
+    args[:xgrid] = args[:xgrid].empty? ? xgrid : args[:xgrid]
     rrdoptions = [
       tmpfile.path,
       '-w', width,
@@ -177,7 +178,7 @@ class Focuslight::RRD
       '-a', 'PNG',
       '-l', 0, #minimum
       '-u', 2, #maximum
-      '-x', args[:xgrid] || xgrid,
+      '-x', xgrid,
       '-s', period,
       '-e', period_end,
       '--slope-mode',
@@ -191,7 +192,7 @@ class Focuslight::RRD
       '--color', 'SHADEB#' + args[:shadeb_color].to_s.upcase,
       '--border', args[:border].to_s.upcase
     ]
-    rrdoptions.push('-y', args[:ygrid]) if args[:ygrid]
+    rrdoptions.push('-y', args[:ygrid]) unless args[:ygrid].empty?
     rrdoptions.push('-t', period_title.to_s.dup) unless args[:notitle]
     rrdoptions.push('--no-legend') unless args[:legend]
     rrdoptions.push('--only-graph') if args[:graphonly]
