@@ -249,13 +249,13 @@ class Focuslight::RRD
         'GPRINT:sumup:MAX:Max\: %%4.1lf%%s%s' % [unit],
         'GPRINT:sumup:MIN:Min\: %%4.1lf%%s%s\l' % [unit],
         'VDEF:sumupcur=sumup,LAST',
-        'PRINT:sumupcur:%%.8lf',
+        'PRINT:sumupcur:%.8lf',
         'VDEF:sumupavg=sumup,AVERAGE',
-        'PRINT:sumupavg:%%.8lf',
+        'PRINT:sumupavg:%.8lf',
         'VDEF:sumupmax=sumup,MAXIMUM',
-        'PRINT:sumupmax:%%.8lf',
+        'PRINT:sumupmax:%.8lf',
         'VDEF:sumupmin=sumup,MINIMUM',
-        'PRINT:sumupmin:%%.8lf',
+        'PRINT:sumupmin:%.8lf',
       )
     end
 
