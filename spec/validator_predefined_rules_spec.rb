@@ -14,7 +14,7 @@ describe Focuslight::Validator do
       expect(r.format("a")).to eql("a")
       expect(r.format(" a ")).to eql("a")
 
-      expect(r.error_message(:col)).to eql("col: missing or blank")
+      expect(r.message).to eql("missing or blank")
     end
 
     it 'returns choice predefined rule' do
@@ -25,7 +25,7 @@ describe Focuslight::Validator do
 
       expect(r1.format("x")).to eql("x")
 
-      expect(r1.error_message(:col)).to eql("col: invalid value")
+      expect(r1.message).to eql("invalid value")
 
       r2 = Focuslight::Validator.rule(:choice, ["x", "y", "z"])
       expect(r2.check("a")).to be_false
@@ -48,7 +48,7 @@ describe Focuslight::Validator do
       expect(r.format("100")).to eql(100)
       expect(r.format("-21")).to eql(-21)
 
-      expect(r.error_message(:col)).to eql("col: invalid integer")
+      expect(r.message).to eql("invalid integer")
     end
 
     it 'returns uint predefined rule' do
@@ -63,7 +63,7 @@ describe Focuslight::Validator do
       expect(r.format("0")).to eql(0)
       expect(r.format("100")).to eql(100)
 
-      expect(r.error_message(:col)).to eql("col: invalid integer (>= 0)")
+      expect(r.message).to eql("invalid integer (>= 0)")
     end
 
     it 'returns natural predefined rule' do
@@ -78,7 +78,7 @@ describe Focuslight::Validator do
       expect(r.format("0")).to eql(0)
       expect(r.format("100")).to eql(100)
 
-      expect(r.error_message(:col)).to eql("col: invalid integer (>= 1)")
+      expect(r.message).to eql("invalid integer (>= 1)")
     end
 
     it 'returns float/double/real predefined rule' do
@@ -103,7 +103,7 @@ describe Focuslight::Validator do
         expect(r.format("2e-10")).to eql(2e-10)
         expect(r.format("-2e-10")).to eql(-2e-10)
 
-        expect(r.error_message(:col)).to eql("col: invalid floating point num")
+        expect(r.message).to eql("invalid floating point num")
       end
     end
 
@@ -116,7 +116,7 @@ describe Focuslight::Validator do
 
       expect(r1.format("0")).to eql(0)
 
-      expect(r1.error_message(:col)).to eql("col: invalid number in range 0..3")
+      expect(r1.message).to eql("invalid number in range 0..3")
 
       r2 = Focuslight::Validator.rule(:int_range, 1..3)
       expect(r2.check("0")).to be_false
@@ -126,7 +126,7 @@ describe Focuslight::Validator do
 
       expect(r2.format("1")).to eql(1)
 
-      expect(r2.error_message(:col)).to eql("col: invalid number in range 1..3")
+      expect(r2.message).to eql("invalid number in range 1..3")
     end
 
     it 'returns bool predefined rule, which parse numeric 1/0 as true/false' do
@@ -146,7 +146,7 @@ describe Focuslight::Validator do
       expect(r.format("True")).to equal(true)
       expect(r.format("false")).to equal(false)
 
-      expect(r.error_message(:col)).to eql("col: invalid bool value")
+      expect(r.message).to eql("invalid bool value")
     end
 
     it 'return regexp predefined rule' do
@@ -160,7 +160,7 @@ describe Focuslight::Validator do
       str = "FfFf"
       expect(r.format(str)).to equal(str)
 
-      expect(r.error_message(:col)).to eql("col: invalid input for pattern ^[0-9a-f]{4}$")
+      expect(r.message).to eql("invalid input for pattern ^[0-9a-f]{4}$")
     end
 
     it 'returns rule instance whatever we want with "lambda" rule name' do
@@ -171,7 +171,7 @@ describe Focuslight::Validator do
 
       expect(r.format("kazeburo")).to eql(:kazeburo)
 
-      expect(r.error_message(:col)).to eql("col: kazeburo only permitted")
+      expect(r.message).to eql("kazeburo only permitted")
     end
   end
 end

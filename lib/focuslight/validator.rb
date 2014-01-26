@@ -58,15 +58,13 @@ module Focuslight
         if rule.check(value)
           formatted = rule.format(value)
         else
-          errors << rule.error_message(key)
+          result.error(key, rule.message)
           valid = false
         end
       end
 
       if valid
         result[key] = formatted
-      else
-        result.error(errors)
       end
     end
 
@@ -81,9 +79,15 @@ module Focuslight
         result[key] = []
       end
 
-      if spec.has_key?(:size) && !spec[:size].include?(values.size)
-        result.error("#{key} doesn't have values specified: #{spec[:size]}")
-        return
+      if spec.has_key?(:size)
+        if (values.nil? || values.size == 0) && !spec[:size].include?(0)
+          result.error(key, "not allowed for empty")
+          return
+        end
+        if !spec[:size].include?(values.size)
+          result.error(key, "doesn't have values specified: #{spec[:size]}")
+          return
+        end
       end
 
       unless values.is_a?(Array)
@@ -103,7 +107,7 @@ module Focuslight
           if rule.check(value)
             formatted = rule.format(value)
           else
-            errors << rule.error_message(key)
+            result.error(key, rule.message)
             valid = false
           end
         end
@@ -113,8 +117,6 @@ module Focuslight
 
       if valid
         result[key] = formatted_values
-      else
-        result.error(error_values)
       end
     end
 
@@ -126,21 +128,17 @@ module Focuslight
 
       rules = [spec[:rule]].flatten.compact
       errors = []
-      valid = true
 
       rules.each do |rule|
         unless rule.check(*values)
-          errors << rule.error_message(keys)
-          valid = false
+          result.error(keys.map{|s| s.to_s}.join(','), rule.message)
         end
-      end
-
-      unless valid
-        result.error(errors)
       end
     end
 
     class Rule
+      attr_reader :message
+
       def initialize(checker, invalid_message, formatter=nil)
         @checker = checker
         @message = invalid_message
@@ -159,15 +157,6 @@ module Focuslight
         else
           value
         end
-      end
-
-      def error_message(param_name)
-        key_name = if param_name.is_a?(Array)
-                     param_name.map(&:to_s).join(',')
-                   else
-                     param_name
-                   end
-        "#{key_name}: #{@message}"
       end
     end
 
@@ -203,7 +192,7 @@ module Focuslight
       attr_reader :errors
 
       def initialize
-        @errors = []
+        @errors = {}
         @params = {}
       end
 
@@ -219,8 +208,8 @@ module Focuslight
         @params[name.to_sym] = value
       end
 
-      def error(messages)
-        @errors += [messages].flatten
+      def error(param, message)
+        @errors[param.to_sym] = "#{param}: " + message
       end
 
       def has_error?

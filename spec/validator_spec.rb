@@ -35,7 +35,7 @@ describe Focuslight::Validator do
       expect(result2[:key1]).to eql(1)
       expect(result2[:key2]).to eql(2)
       expect(result2[:keyx]).to be_nil
-      expect(result2.errors).to eql(["keyx: invalid integer (>= 0)"])
+      expect(result2.errors).to eql({keyx: "keyx: invalid integer (>= 0)"})
     end
   end
 
@@ -115,7 +115,7 @@ describe Focuslight::Validator do
       r2 = Focuslight::Validator::Result.new
       Focuslight::Validator.validate_multi_key(r2, params, [:key1, :key2, :key4], spec)
       expect(r2.has_error?).to be_true
-      expect(r2.errors).to eql(["key1,key2,key4: too large"])
+      expect(r2.errors).to eql({:'key1,key2,key4' => "key1,key2,key4: too large"})
     end
   end
 end

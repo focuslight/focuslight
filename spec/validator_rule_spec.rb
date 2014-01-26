@@ -57,12 +57,12 @@ describe Focuslight::Validator::Rule do
     end
   end
 
-  describe '#error_message' do
-    it 'returns message, prefixed with argument string' do
+  describe '#message' do
+    it 'returns predefined message' do
       r = Focuslight::Validator::Rule.new(->(v){ v.nil? }, "nil only allowed")
-      expect(r.error_message(:address)).to eql("address: nil only allowed")
-      expect(r.error_message(:something)).to eql("something: nil only allowed")
-      expect(r.error_message([:a, :b, :c])).to eql("a,b,c: nil only allowed")
+      expect(r.message).to eql("nil only allowed")
+      expect(r.message).to eql("nil only allowed")
+      expect(r.message).to eql("nil only allowed")
     end
   end
 end
