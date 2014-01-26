@@ -334,17 +334,17 @@ class Focuslight::Web < Sinatra::Base
     specs = complex_graph_request_spec_generator.(type2s_num)
     additional = {
       [:service_name, :section_name, :graph_name] => {
-        rule: rule(:lambda, ->(service,section,graph){ data().get_complex(service,section,graph).nil? })
+        rule: rule(:lambda, ->(service,section,graph){ data().get_complex(service,section,graph).nil? }, "duplicate graph path")
       },
     }
     specs.update(additional)
-    req_params = validate(params, request_param_specs)
+    req_params = validate(params, specs)
 
     if req_params.has_error?
       json({error: 1, messages: req_params.errors})
     else
       data().create_complex(req_params[:service_name], req_params[:section_name], req_params[:graph_name], req_params.hash)
-      created_path = "/list/%s/%s/%s" % [:service_name,:section_name,:graph_name].map{|s| urlencode(req_params[s])}
+      created_path = "/list/%s/%s" % [:service_name,:section_name].map{|s| urlencode(req_params[s])}
       json({error: 0, location: url_for(created_path)})
     end
   end
