@@ -210,7 +210,7 @@ module Focuslight
         data_rows << {type: t, path: p, gmode: g, stack: s, graph_id: p}
       end
 
-      @sumup = @parsed_meta.fetch(:sump, '0') != '0' # '0' is false
+      @sumup = @parsed_meta.fetch(:sumup, '0') != '0' # '0' is false
       @data_rows = data_rows
       @complex_graph = uri
     end
