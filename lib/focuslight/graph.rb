@@ -175,7 +175,7 @@ module Focuslight
     end
   end
 
-  class ComplexGraph
+  class ComplexGraph < Graph
     attr_accessor :sumup, :data_rows
     attr_reader :complex_graph
 
