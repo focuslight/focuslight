@@ -7,11 +7,11 @@
   <div class="col-sm-8">
     <div class="input-group">
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="service_name" <%= complex.service %> />
+      <input type="text" class="form-control" name="service_name" value="<%= complex.service %>" />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="section_name" <%= complex.section %> />
+      <input type="text" class="form-control" name="section_name" value="<%= complex.section %>" />
       <span class="input-group-addon">/</span>
-      <input type="text" class="form-control" name="graph_name" <%= complex.graph %> />
+      <input type="text" class="form-control" name="graph_name" value="<%= complex.graph %>" />
     </div>
     <p class="help-block">Graph's URI(service name/section name/graph name)</p>
   </div>
@@ -20,7 +20,7 @@
 <div class="form-group">
   <label for="" class="col-sm-3 control-label">Description</label>
   <div class="col-sm-9">
-    <input type="text" class="form-control" name="description" <%= complex.description %> />
+    <input type="text" class="form-control" name="description" value="<%= complex.description %>" />
   </div>
 </div>
 
@@ -73,7 +73,7 @@
 </select></td>
 <td><select name="path-1" class="form-control">
 <% graphs.each do |graph| %>
-<option value="<%= graph.id %>" <%= selected?(first_row[:path], graph.id) %>>/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<option value="<%= graph['id'] %>" <%= selected?(first_row[:path], graph['id']) %>>/<%= graph['service_name'] %>/<%= graph['section_name'] %>/<%= graph['graph_name'] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-1" class="form-control">
@@ -108,7 +108,7 @@
 </select></t>
 <td><select name="path-add" id="path-add" class="form-control">
 <% graphs.each do |graph| %>
-<option value="<%= graph.id %>">/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %></option>
+<option value="<%= graph['id'] %>" <%= selected?(first_row[:path], graph['id']) %>>/<%= graph['service_name'] %>/<%= graph['section_name'] %>/<%= graph['graph_name'] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
@@ -128,7 +128,7 @@
 <td><span class="table-order-pointer table-order-up">⬆</span><span class="table-order-pointer table-order-down">⬇</span></td>
 <td><%= case row[:type] when 'AREA' then 'AREA' when 'LINE1' then 'LINE' else 'LINE(Bold)' end %><input type="hidden" name="type-2[]" value="<%= row[:type] %>"/></td>
 <% graph = dic[row[:graph_id]] %>
-<td>/<%= graph.service %>/<%= graph.section %>/<%= graph.graph %><input type="hidden" name="path-2[]" value="<%= row[:path] %>"/></td>
+<td>/<%= graph['service_name'] %>/<%= graph['section_name'] %>/<%= graph['graph_name'] %><input type="hidden" name="path-2[]" value="<%= row[:path] %>"/></td>
 <td style="text-align:center"><%= row[:gmode] == 'gauge' ? 'Gauge' : 'Subtract' %><input type="hidden" name="gmode-2[]" value="<%= row[:gmode] %>" /></td>
 <td style="text-align:center"><%= row[:stack] ? 'enable' : 'disable' %><input type="hidden" name="stack-2[]" value="<%= row[:stack] ? 1 : 0 %>" /></td>
 <td style="text-align:center"><span class="table-order-remove">✖</span></td>
