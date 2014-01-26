@@ -173,14 +173,14 @@ class Focuslight::Web < Sinatra::Base
     condition do
       graph = case type
               when :simple
-                if params.has_key?(:graph_id)
-                  data().get_by_id(params[:graph_id])
+                if params[:graph_id]
+                  data().get_by_id(params[:graph_id].to_i)
                 else
                   data().get(params[:service_name], params[:section_name], params[:graph_name])
                 end
               when :complex
-                if params.has_key?(:complex_id)
-                  data().get_complex_by_id(params[:complex_id])
+                if params[:complex_id]
+                  data().get_complex_by_id(params[:complex_id].to_i)
                 else
                   data().get_complex(params[:service_name], params[:section_name], params[:graph_name])
                 end
@@ -351,7 +351,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
-    graph_dic = Hash[ graphs.map{|g| [g.id, g]} ]
+    graph_dic = Hash[ graphs.map{|g| [g['id'], g]} ]
     erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic } #TODO: disable_subtract
   end
 
@@ -365,18 +365,18 @@ class Focuslight::Web < Sinatra::Base
       [:service_name, :section_name, :graph_name] => {
         rule: rule(:lambda, ->(service,section,graph){
             graph = data().get_complex(service,section,graph)
-            graph.nil? || graph.id == current_graph_id.id
-          })
+            graph.nil? || graph.id == current_graph_id
+          }, "graph path must be unique")
       },
     }
     specs.update(additional)
-    req_params = validate(params, request_param_specs)
+    req_params = validate(params, specs)
 
     if req_params.has_error?
       json({error: 1, messages: req_params.errors})
     else
       data().update_complex(request.stash[:graph].id, req_params.hash)
-      created_path = "/list/%s/%s/%s" % [:service_name,:section_name,:graph_name].map{|s| urlencode(req_params[s])}
+      created_path = "/list/%s/%s" % [:service_name,:section_name].map{|s| urlencode(req_params[s])}
       json({error: 0, location: url_for(created_path)})
     end
   end
