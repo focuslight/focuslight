@@ -134,14 +134,14 @@ function table_order_remove() {
 
 function preview_complex_graph(myform) {
   var uri =  myform.find('select[name="type-1"]').val() + ':' + myform.find('select[name="path-1"]').val() + ':' + myform.find('select[name="gmode-1"]').val() + ':0';
-  var num = myform.find('input[name=type-2]').length;
+  var num = myform.find('input[name="type-2[]"]').length;
 
   for (var i=0; i < num; i++ ) {
       uri += ':'
-           + myform.find('input[name="type-2"]').eq(i).val() + ':'
-           + myform.find('input[name="path-2"]').eq(i).val() + ':'
-           + myform.find('input[name="gmode-2"]').eq(i).val() + ':'
-           + myform.find('input[name="stack-2"]').eq(i).val();
+           + myform.find('input[name="type-2[]"]').eq(i).val() + ':'
+           + myform.find('input[name="path-2[]"]').eq(i).val() + ':'
+           + myform.find('input[name="gmode-2[]"]').eq(i).val() + ':'
+           + myform.find('input[name="stack-2[]"]').eq(i).val();
   }
   var base = $('ul.nav:first > li:first > a').attr('href');
   var img = $('<img />');
