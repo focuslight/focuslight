@@ -527,7 +527,7 @@ class Focuslight::Web < Sinatra::Base
     unless req_params[:description].empty?
       data().update_graph_description(graph.id, req_params[:description])
     end
-    json({ error: 0, data => graph.to_hash })
+    json({ error: 0, data: graph.to_hash })
   end
 
   # graph4json => Focuslight::Graph#to_hash
