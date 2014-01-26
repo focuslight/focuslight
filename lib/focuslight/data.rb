@@ -242,14 +242,15 @@ SQL
   end
 
   def create_complex(service, section, graph, args)
+    description = args[:description]
+    sort = args[:sort]
     meta = Focuslight::ComplexGraph.meta_clean(args).to_json
     now = Time.now.to_i
     sql = <<SQL
 INSERT INTO complex_graphs (service_name, section_name, graph_name, description, sort, meta,  created_at, updated_at)
        VALUES (?,?,?,?,?,?,?,?)
 SQL
-    @db.execute(sql, [service, section, graph, args['description'], args['sort'].to_i, meta, now, now])
-
+    @db.execute(sql, [service, section, graph, description, sort.to_i, meta, now, now])
     get_complex(service, section, graph)
   end
 
