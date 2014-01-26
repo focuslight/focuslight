@@ -263,7 +263,7 @@ SQL
 UPDATE complex_graphs
   SET service_name = ?, section_name = ?, graph_name = ?,
       description = ?, sort = ?, meta = ?, updated_at = ?
-  WHERE id=?'
+  WHERE id=?
 SQL
     @db.execute(sql,
       [
