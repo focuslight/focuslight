@@ -13,7 +13,7 @@ Focuslight is currently lacking some GrowthForecast features:
  * MySQL support
  * Disabling Subtract
 
-### Prerequisites
+## Prerequisites
 
 RRDTool and its dependencies must be installed before installing Focuslight.
 
@@ -24,7 +24,7 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 * OSX
   * `brew install rrdtool`
 
-### Installation
+## Installation
 
 Install focuslight with Ruby 2.0 or later. Execute after installation.
 
