@@ -1,23 +1,21 @@
 # Focuslight
 
-Lightning Fast Graphing/Visualization, built on RRDTool - Ruby clone of GrowthForecast
+Focuslight is a lightning Fast Graphing/Visualization tool, built on RRDTool. It is a Ruby clone of [GrowthForecast](http://kazeburo.github.io/GrowthForecast/).
 
-For GrowthForecast, see: http://kazeburo.github.io/GrowthForecast/
-
-Focuslight has compatibilities with:
+Focuslight is compatible with:
  * stored data files
-   * database(sqlite) and graphs(rrdtool)
- * almost all of HTTP API requests, except for
+   * database (sqlite) and graphs (rrdtool)
+ * almost all HTTP API requests, except for:
    * complex graph creation
-   * `export` supports (focuslight does NOT support it currently)
+   * `export` support
 
-Currently, focuslight doesn't have some features:
+Focuslight is currently lacking some GrowthForecast features:
  * MySQL support
  * Disabling Subtract
 
-## Installation
+### Prerequisites
 
-RRDTool and its dependencies must be installed before focuslight installation.
+RRDTool and its dependencies must be installed before installing Focuslight.
 
 * RHEL/CentOS
   * `sudo install rrdtool`
@@ -26,7 +24,9 @@ RRDTool and its dependencies must be installed before focuslight installation.
 * OSX
   * `brew install rrdtool`
 
-And then, install focuslight with Ruby 2.0 or later, and execute.
+### Installation
+
+Install focuslight with Ruby 2.0 or later. Execute after installation.
 
 1. clone this repository
 1. `cd focuslight`
@@ -36,11 +36,11 @@ And then, install focuslight with Ruby 2.0 or later, and execute.
 
 See `http://localhost:5125/`
 
-## Configurations
+## Configuration
 
-See and edit `.env` in project root directory.
+To configure Focuslight, edit the `.env` file in the project root directory.
 
-Default configurations are:
+The default configuration is as follows:
 
 ```
 DATADIR=./data
@@ -57,8 +57,8 @@ FLOAT_SUPPORT=n
 
 ## Switch from GrowthForecast
 
-1. Copy directory and its contents of `datadir` of GrowthForecast to `./data` (or where you specified)
-1. Execute focuslight
+1. Copy GrowthForecast's `datadir` directory (and its contents) to `./data` (or where you specified)
+1. Execute Focuslight
 
 ## TODO
 
