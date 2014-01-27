@@ -30,8 +30,9 @@ And then, install focuslight with Ruby 2.0 or later, and execute.
 
 1. clone this repository
 1. `cd focuslight`
-1. `bundle install`
-1. `bundle exec foreman start`
+1. install dependencies: `bundle install`
+1. initialize database: `bundle exec rake init`
+1. execute: `bundle exec foreman start`
 
 See `http://localhost:5125/`
 
