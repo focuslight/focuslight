@@ -17,8 +17,8 @@ Focuslight is currently lacking some GrowthForecast features:
 
 RRDTool and its dependencies must be installed before installing Focuslight.
 
-* RHEL/CentOS
-  * `sudo install rrdtool`
+* RHEL/CentOS 6.x
+  * Add `epel` repository, then `sudo yum install rrdtool rrdtool-devel`
 * Ubuntu
   * `sudo apt-get rrdtool`
 * OSX
