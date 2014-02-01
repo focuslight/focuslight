@@ -5,6 +5,8 @@ require "sqlite3"
 
 module Focuslight::Init
   def self.run
+    datadir = Focuslight::Config.get(:datadir)
+    FileUtils.mkdir_p(datadir)
     data = Focuslight::Data.new
     number_type = data.number_type
 
