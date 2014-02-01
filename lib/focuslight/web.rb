@@ -35,9 +35,7 @@ class Focuslight::Web < Sinatra::Base
 
   configure do
     datadir = Focuslight::Config.get(:datadir)
-    unless Dir.exists?(datadir)
-      Dir.mkdir(datadir)
-    end
+    FileUtils.mkdir_p(datadir)
   end
 
   helpers Sinatra::JSON
