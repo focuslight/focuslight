@@ -110,7 +110,7 @@ class Focuslight::Data
           number += graph.number
         end
         if mode != 'modified' || (mode == 'modified' && graph.number != number)
-          color ||= graph.color
+          color = graph.color if color.empty?
           db.execute(
             'UPDATE graphs SET number=?, mode=?, color=?, updated_at=? WHERE id = ?',
             [number, mode, color, Time.now.to_i, graph.id]
