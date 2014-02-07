@@ -157,7 +157,7 @@ class Focuslight::RRD
   def graph(datas, args)
     datas = [datas] unless datas.is_a?(Array)
     a_gmode = args[:gmode]
-    span = args.fetch('t', 'd')
+    span = args.fetch(:t, :d)
     from = args[:from]
     to = args[:to]
     width = args.fetch(:width, 390)
