@@ -129,20 +129,20 @@ class Focuslight::Web < Sinatra::Base
     end
 
     def pathinfo(params)
-      p = []
-      return p unless params[:service_name]
+      items = []
+      return items unless params[:service_name]
 
-      p << params[:service_name]
-      return p unless params[:section_name]
+      items << params[:service_name]
+      return items unless params[:section_name]
 
-      p << params[:section_name]
-      return p unless params[:graph_name]
+      items << params[:section_name]
+      return items unless params[:graph_name]
 
-      p << params[:graph_name]
-      return p unless params[:t]
+      items << params[:graph_name]
+      return items unless params[:t]
 
-      p << params[:t]
-      p
+      items << params[:t]
+      items
     end
 
     def linkpath(ary, prefix='/list')
