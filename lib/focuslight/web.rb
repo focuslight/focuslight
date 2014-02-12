@@ -427,7 +427,7 @@ class Focuslight::Web < Sinatra::Base
 
     data = []
     request.stash[:graph].data_rows.each do |row|
-      g = data().get_by_id(row[:graphid])
+      g = data().get_by_id(row[:graph_id])
       g.c_type = row[:type]
       g.c_gmode = row[:gmode]
       g.stack = row[:stack]
@@ -443,7 +443,7 @@ class Focuslight::Web < Sinatra::Base
 
     data = []
     request.stash[:graph].data_rows.each do |row|
-      g = data().get_by_id(row[:graphid])
+      g = data().get_by_id(row[:graph_id])
       g.c_type = row[:type]
       g.c_gmode = row[:gmode]
       g.stack = row[:stack]
