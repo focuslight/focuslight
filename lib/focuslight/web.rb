@@ -287,7 +287,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   post '/delete/:service_name/:section_name/:graph_name', :graph => :simple do
-    delete(request.stash[:graph])
+    delete(request.stash[:graph]).to_json
   end
 
   get '/add_complex' do
@@ -542,19 +542,19 @@ class Focuslight::Web < Sinatra::Base
 
   # alias to /delete/:service_name/:section_name/:graph_name
   post '/json/delete/graph/:service_name/:section_name/:graph_name', :graph => :simple do
-    delete(request.stash[:graph])
+    delete(request.stash[:graph]).to_json
   end
 
   post '/json/delete/graph/:graph_id', :graph => :simple do
-    delete(request.stash[:graph])
+    delete(request.stash[:graph]).to_json
   end
 
   post '/json/delete/complex/:service_name/:section_name/:graph_name', :graph => :complex do
-    delete(request.stash[:graph])
+    delete(request.stash[:graph]).to_json
   end
 
   post '/json/delete/complex/:complex_id', :graph => :complex do
-    delete(request.stash[:graph])
+    delete(request.stash[:graph]).to_json
   end
 
   get '/json/graph/:graph_id', :graph => :simple do
