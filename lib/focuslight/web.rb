@@ -623,7 +623,7 @@ class Focuslight::Web < Sinatra::Base
       halt 404
     end
 
-    spec = JSON.parse(request.body || '{}', symbolize_names: true)
+    spec = JSON.parse(request.body.read || '{}', symbolize_names: true)
     id = spec.delete(:id) || graph.id
 
     if spec.has_key?(:data)
