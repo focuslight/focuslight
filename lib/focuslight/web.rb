@@ -579,7 +579,7 @@ class Focuslight::Web < Sinatra::Base
 
   # TODO in create/edit, validations about json object properties, sub graph id existense, ....
   post '/json/create/complex' do
-    spec = JSON.parse(request.body || '{}', symbolize_names: true)
+    spec = JSON.parse(request.body.read || '{}', symbolize_names: true)
 
     exists_simple = data().get(spec[:service_name], spec[:section_name], spec[:graph_name])
     exists_complex = data().get_complex(spec[:service_name], spec[:section_name], spec[:graph_name])
@@ -602,10 +602,9 @@ class Focuslight::Web < Sinatra::Base
       data[:stack] = true unless data.has_key?(:stack)
     end
 
-    request = Focuslight::Graph.hash2request(spec)
-    data().create_complex(spec[:service_name], spec[:section_name], spec[:graph_name], request)
-
-    section_path = "/list/%s/%s" % [:service_name,:section_name].map{|s| urlencode(req_params[s])}
+    internal = Focuslight::Graph.hash2request(spec)
+    data().create_complex(spec[:service_name], spec[:section_name], spec[:graph_name], internal)
+    section_path = "/list/%s/%s" % [:service_name,:section_name].map{|s| urlencode(spec[s])}
     json({ error: 0, location: url_for(section_path) })
   end
 
