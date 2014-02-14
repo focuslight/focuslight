@@ -498,7 +498,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/api/:service_name/:section_name/:graph_name', :graph => :simple do
-    json(request.hash[:graph].to_hash)
+    json(request.stash[:graph].to_hash)
   end
 
   post '/api/:service_name/:section_name/:graph_name' do
