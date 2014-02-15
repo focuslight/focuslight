@@ -633,11 +633,11 @@ class Focuslight::Web < Sinatra::Base
       end
     end
 
-    request = Focuslight::Graph.hash2request(spec)
+    internal = Focuslight::Graph.hash2request(spec)
     if graph.complex?
-      data().update_graph(graph.id, request)
+      data().update_complex(graph.id, internal)
     else
-      data().update_complex(graph.id, request)
+      data().update_graph(graph.id, internal)
     end
     json({ error: 0 })
   end
