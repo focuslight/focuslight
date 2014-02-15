@@ -58,6 +58,7 @@ module Focuslight
     end
 
     def self.hash2request(hash)
+      hash = hash.dup
       is_complex = hash.delete(:complex)
 
       hash.delete(:id)

@@ -6,7 +6,6 @@ Focuslight is compatible with:
  * stored data files
    * database (sqlite) and graphs (rrdtool)
  * almost all HTTP API requests, except for:
-   * complex graph creation
    * `export` support
 
 Focuslight is currently lacking some GrowthForecast features:
