@@ -134,7 +134,8 @@ module Focuslight
         ulimit: @ulimit, llimit: @llimit, sulimit: @sulimit, sllimit: @sllimit,
         type: @type, stype: @stype,
         adjust: @adjust, adjustval: @adjustval, unit: @unit,
-        complex: false
+        complex: false,
+        md5: @md5, meta: @meta,
       }
       hash = super
       hash.merge(simple)
