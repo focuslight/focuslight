@@ -183,7 +183,7 @@ class Focuslight::Data
     return nil unless graph
 
     graph.update(args)
-    @graph.where(id: graph.id)
+    @graphs.where(id: graph.id)
       .update(
               service_name: graph.service,
               section_name: graph.section,
