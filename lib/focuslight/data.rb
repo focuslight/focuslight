@@ -6,6 +6,7 @@ require "sequel"
 
 class Focuslight::Data
 
+  # TODO: A connection per request via Sequel::ConnectionPool would be better with MySQL
   DB = Sequel.connect(Focuslight::Config.get(:dburl))
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
