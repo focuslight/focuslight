@@ -470,15 +470,12 @@ class Focuslight::Web < Sinatra::Base
     data = []
     req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
       g = data().get_by_id(id)
-      p g
       next unless g
       g.c_type = type
       g.c_gmode = gmode
       g.stack = !!(stack =~ /^(1|true)$/i)
       data << g
     end
-    p data
-    p req_params.hash
     graph_img = rrd().graph(data, req_params.hash)
     [200, {'Content-Type' => 'image/png'}, graph_img]
   end
