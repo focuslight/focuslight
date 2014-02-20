@@ -6,13 +6,12 @@ require "sequel"
 
 class Focuslight::Data
 
-  DB_URL = Focuslight::Config.get(:dburl)
-  DB = Sequel.connect(DB_URL)
+  DB = Sequel.connect(Focuslight::Config.get(:dburl))
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
 
-    if DB_URL =~ /sqlite/
+    if DB.database_type == :sqlite
       DB.run 'PRAGMA journal_mode = WAL'
       DB.run 'PRAGMA synchronous = NORMAL'
     end
