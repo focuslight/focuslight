@@ -17,7 +17,7 @@ module Focuslight
     attr_accessor :meta
     attr_accessor :created_at_time, :updated_at_time
 
-    attr_accessor :c_type, :c_gmode, :stack # for complex graph construction
+    attr_accessor :c_type, :stack # for complex graph construction
 
     def initialize(row)
       @row_hash = row
@@ -75,20 +75,16 @@ module Focuslight
       first = data_rows.shift
       hash['path-1'.to_sym] = first[:graph_id]
       hash['type-1'.to_sym] = first[:type]
-      hash['gmode-1'.to_sym] = first[:gmode]
 
       p2 = 'path-2'.to_sym
       t2 = 'type-2'.to_sym
-      g2 = 'gmode-2'.to_sym
       s2 = 'stack-2'.to_sym
       hash[p2] = []
       hash[t2] = []
-      hash[g2] = []
       hash[s2] = []
       data_rows.each do |row|
         hash[p2] << row[:graph_id]
         hash[t2] << row[:type]
-        hash[g2] << row[:gmode]
         hash[s2] << (row[:stack] ? '1' : '0')
       end
 
@@ -100,7 +96,7 @@ module Focuslight
     COLUMNS = %w(service_name section_name graph_name number mode color llimit created_at updated_at)
     PLACEHOLDERS = COLUMNS.map{|c| '?'}
 
-    attr_accessor :mode, :gmode, :color, :ulimit, :llimit, :type
+    attr_accessor :mode, :color, :ulimit, :llimit, :type
 
     attr_reader :md5
     attr_accessor :adjust, :adjustval, :unit
@@ -109,7 +105,6 @@ module Focuslight
       super
 
       @mode = row[:mode] || 'gauge' # NOT NULL DEFAULT 'gauge'
-      @gmode = row[:gmode] || 'gauge'
       @color = row[:color] || '#00CC00' # NOT NULL DEFAULT '#00CC00'
       @ulimit = row[:ulimit] || 1000000000000000 # NOT NULL DEFAULT 1000000000000000
       @llimit = row[:llimit] || 0
@@ -124,7 +119,7 @@ module Focuslight
 
     def to_hash
       simple = {
-        mode: @mode, gmode: @gmode, color: @color,
+        mode: @mode, color: @color,
         ulimit: @ulimit, llimit: @llimit,
         type: @type,
         adjust: @adjust, adjustval: @adjustval, unit: @unit,
@@ -147,7 +142,6 @@ module Focuslight
         when :description then @description = v
         when :sort then @sort = v
         when :mode then @mode = v
-        when :gmode then @gmode = v
         when :color then @color = v
         when :ulimit then @ulimit = v
         when :llimit then @llimit = v
@@ -163,7 +157,7 @@ module Focuslight
     def self.meta_clean(args={})
       args.delete_if do |k,v|
         %w(id service_name section_name graph_name number
-           description sort mode gmode color ulimit llimit type).include?(k.to_s)
+           description sort mode color ulimit llimit type).include?(k.to_s)
       end
     end
   end
@@ -175,21 +169,20 @@ module Focuslight
     def initialize(row)
       super
 
-      uri = [:'type-1', :'path-1', :'gmode-1'].map{|k| @parsed_meta[k]}.join(':') + ':0' # stack
+      uri = [:'type-1', :'path-1'].map{|k| @parsed_meta[k]}.join(':') + ':0' # stack
 
       data_rows = []
 
       first_row = {
         type: @parsed_meta[:'type-1'],
         path: @parsed_meta[:'path-1'].to_i,
-        gmode: @parsed_meta[:'gmode-1'],
         stack: false,
         graph_id: @parsed_meta[:'path-1'].to_i,
       }
       data_rows << first_row
 
       unless @parsed_meta[:'type-2'].is_a?(Array)
-        [:'type-2', :'path-2', :'gmode-2', :'stack-2'].each do |key|
+        [:'type-2', :'path-2', :'stack-2'].each do |key|
           @parsed_meta[key] = [@parsed_meta[key]].flatten
         end
       end
@@ -197,10 +190,9 @@ module Focuslight
       @parsed_meta[:'type-2'].each_with_index do |type, i|
         t = @parsed_meta[:'type-2'][i]
         p = @parsed_meta[:'path-2'][i].to_i
-        g = @parsed_meta[:'gmode-2'][i]
         s = @parsed_meta[:'stack-2'][i].is_a?(String) ? !!(@parsed_meta[:'stack-2'][i] =~ /^(1|true)$/i) : !!@parsed_meta[:'stack-2'][i]
-        uri += ':' + [t, p, g, (s ? '1' : '0')].join(':')
-        data_rows << {type: t, path: p, gmode: g, stack: s, graph_id: p}
+        uri += ':' + [t, p, (s ? '1' : '0')].join(':')
+        data_rows << {type: t, path: p, stack: s, graph_id: p}
       end
 
       @sumup = @parsed_meta.fetch(:sumup, '0') != '0' # '0' is false

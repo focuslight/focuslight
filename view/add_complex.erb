@@ -74,10 +74,6 @@
 <option value="<%= row[:id] %>">/<%= row[:service_name] %>/<%= row[:section_name] %>/<%= row[:graph_name] %></option>
 <% end %>
 </select></td>
-<td style="text-align: center"><select name="gmode-1" class="form-control">
-<option value="gauge" <%= selected?(params[:'gmode-1'], 'gauge') %>>Gauge</option>
-<option value="subtract" <%= selected?(params[:'gmode-1'], 'subtract') %>>Subtract</option>
-</select></td>
 </tr>
 </table>
 </div>
@@ -108,10 +104,6 @@
 <% graphs.each do |row| %>
 <option value="<%= row[:id] %>">/<%= row[:service_name] %>/<%= row[:section_name] %>/<%= row[:graph_name] %></option>
 <% end %>
-</select></td>
-<td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
-<option value="gauge">Gauge</option>
-<option value="subtract">Subtract</option>
 </select></td>
 <td style="text-align:center;"><select name="stack-add" id="stack-add" class="form-control">
 <option value="1">enable</option>

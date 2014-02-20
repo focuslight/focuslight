@@ -79,14 +79,12 @@ function setHxrConfirmBtn() {
 function add_new_row(e) {
   var path = $('#path-add').val();
   var type = $('#type-add').val();
-  var gmode = $('#gmode-add').val();
   var stack = $('#stack-add').val();
 
   var tr = $('<tr></tr>');
   tr.append('<td><span class="table-order-pointer table-order-up">⬆</span><span class="table-order-pointer table-order-down">⬇</span></td>');
   tr.append('<td style="text-align:left">'+$('#type-add option:selected').html()+'<input type="hidden" name="type-2[]" value="'+type+'" /></td>');
   tr.append('<td>'+$('#path-add option:selected').html()+'<input type="hidden" name="path-2[]" value="'+path+'" /></td>');
-  tr.append('<td style="text-align:center">'+$('#gmode-add option:selected').html()+'<input type="hidden" name="gmode-2[]" value="'+gmode+'" /></td>');
   tr.append('<td style="text-align:center">'+$('#stack-add option:selected').html()+'<input type="hidden" name="stack-2[]" value="'+stack+'" /></td>');
   tr.append('<td style="text-align:center"><span class="table-order-remove">✖</span></td>');
   tr.appendTo($('table#add-data-tbl'));
@@ -138,14 +136,13 @@ function table_order_remove() {
 };
 
 function preview_complex_graph(myform) {
-  var uri =  myform.find('select[name="type-1"]').val() + ':' + myform.find('select[name="path-1"]').val() + ':' + myform.find('select[name="gmode-1"]').val() + ':0';
+  var uri =  myform.find('select[name="type-1"]').val() + ':' + myform.find('select[name="path-1"]').val() + ':0';
   var num = myform.find('input[name="type-2[]"]').length;
 
   for (var i=0; i < num; i++ ) {
       uri += ':'
            + myform.find('input[name="type-2[]"]').eq(i).val() + ':'
            + myform.find('input[name="path-2[]"]').eq(i).val() + ':'
-           + myform.find('input[name="gmode-2[]"]').eq(i).val() + ':'
            + myform.find('input[name="stack-2[]"]').eq(i).val();
   }
   var base = $('ul.nav:first > li:first > a').attr('href');

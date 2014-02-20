@@ -37,17 +37,6 @@
 </div>
 
 <div class="form-group">
-  <label for="" class="col-sm-3 control-label">Mode</label>
-  <div class="col-sm-4">
-    <select name="gmode" class="form-control">
-    <option value="gauge" <%=    selected?(graph.gmode, 'gauge') %>>Gauge</option>
-    <option value="subtract" <%= selected?(graph.gmode, 'subtract') %>>Subtract</option>
-    <option value="both" <%=     selected?(graph.gmode, 'both') %>>Both</option>
-    </select>
-   </div>
-</div>
-
-<div class="form-group">
   <label for="" class="col-sm-3 control-label">Data adjustment</label>
   <div class="col-sm-7">
     <div class="input-group">

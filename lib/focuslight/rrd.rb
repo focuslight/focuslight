@@ -149,7 +149,6 @@ class Focuslight::RRD
 
   def graph(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args[:gmode]
     span = args.fetch(:t, :d)
     from = args[:from]
     to = args[:to]
@@ -195,7 +194,6 @@ class Focuslight::RRD
 
     defs = []
     datas.each_with_index do |data, i|
-      gmode = data.c_gmode ? data.c_gmode : a_gmode
       type  = data.c_type ? data.c_type : data.type
       gdata =  'num'
       llimit = data.llimit
@@ -302,7 +300,6 @@ class Focuslight::RRD
 
   def export(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args[:gmode]
     span = args.fetch(:t, 'd')
     from = args[:from]
     to = args[:to]
@@ -321,7 +318,6 @@ class Focuslight::RRD
 
     defs = []
     datas.each_with_index do |data, i|
-      gmode = data.c_gmode ? data.c_gmode : a_gmode
       type  = data.c_type ? data.c_type : data.type
       gdata =  'num'
       llimit = data.llimit

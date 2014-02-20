@@ -37,7 +37,6 @@ class Focuslight::Data
         column :mode, String, default: "gauge", null: false
         column :description, String, default: "", null: false
         column :sort, Bignum, default: "", null: false
-        column :gmode, String, default: "gauge", null: false
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
@@ -140,7 +139,6 @@ class Focuslight::Data
               graph_name: graph.graph,
               description: graph.description,
               sort: graph.sort,
-              gmode: graph.gmode,
               color: graph.color,
               type: graph.type,
               llimit: graph.llimit,
