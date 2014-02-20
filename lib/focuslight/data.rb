@@ -2,86 +2,128 @@ require "focuslight"
 require "focuslight/config"
 require "focuslight/graph"
 
-require "sqlite3"
+require "sequel"
 
 class Focuslight::Data
-  SQLITE_FILENAME = "gforecast.db" # comapibility with GrowthForecast
-
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
-    @floatings = Focuslight::Config.get(:float_support)
-    filepath = File.join(@datadir, SQLITE_FILENAME)
+    @floatings = Focuslight::Config.get(:float_support) == "y"
+    db_url = Focuslight::Config.get(:dburl)
+    @db = Sequel.connect(db_url)
 
-    @db = SQLite3::Database.new(filepath)
-    @db.results_as_hash = true
-
-    @db.execute 'PRAGMA journal_mode = WAL'
-    @db.execute 'PRAGMA synchronous = NORMAL'
-  end
-
-  def execute(*args)
-    @db.execute(*args)
-  end
-
-  def transaction
-    @db.transaction(:immediate) do |db|
-      yield db
+    if db_url =~ /sqlite/
+      @db.run 'PRAGMA journal_mode = WAL'
+      @db.run 'PRAGMA synchronous = NORMAL'
     end
+    @graphs = @db.from(:graphs)
+    @complex_graphs = @db.from(:complex_graphs)
   end
 
   def number_type
-    @floatings ? 'REAL' : 'INT'
+    @floatings ? Float : Integer
+  end
+
+  def create_tables
+    ntype = number_type
+    @db.transaction do
+
+      @db.create_table :graphs do
+        primary_key :id
+        column :service_name, String, null: false
+        column :section_name, String, null: false
+        column :graph_name, String, null: false
+        column :number, ntype, default: 0
+        column :mode, String, default: "gauge", null: false
+        column :description, String, default: "", null: false
+        column :sort, Bignum, default: "", null: false
+        column :gmode, String, default: "gauge", null: false
+        column :color, String, default: "#00CC00", null: false
+        column :ulimit, ntype, default: 1000000000000000, null: false
+        column :llimit, ntype, default: 0, null: false
+        column :sulimit, ntype, default: 100000, null: false
+        column :sllimit, ntype, default: 0, null: false
+        column :type, String, default: "AREA", null: false
+        column :stype, String, default: "AREA", null: false
+        String :meta, text: true
+        column :created_at, Bignum, null: false
+        column :updated_at, Bignum, null: false
+        unique [:service_name, :section_name, :graph_name]
+      end
+
+      @db.create_table :prev_graphs do
+        column :graph_id, Integer, null: false
+        column :number, ntype, default: 0, null: false
+        column :subtract, ntype
+        column :updated_at, Bignum, null: false
+        primary_key [:graph_id]
+      end
+
+      @db.create_table :prev_short_graphs do
+        column :graph_id, Integer, null: false
+        column :number, ntype, default: 0, null: false
+        column :subtract, ntype
+        column :updated_at, Bignum, null: false
+        primary_key [:graph_id]
+      end
+
+      @db.create_table :complex_graphs do
+        primary_key :id
+        column :service_name, String, null: false
+        column :section_name, String, null: false
+        column :graph_name, String, null: false
+        column :number, ntype, default: 0
+        column :description, String, default: "", null: false
+        column :sort, Bignum, default: "", null: false
+        String :meta, text: true
+        column :created_at, Bignum, null: false
+        column :updated_at, Bignum, null: false
+        unique [:service_name, :section_name, :graph_name]
+      end
+    end
+  end
+
+  def execute(*args)
+    @db.run(*args)
+  end
+
+  def transaction
+    @db.transaction do
+      yield @db
+    end
   end
 
   def get(service, section, graph)
-    data = @db.get_first_row(
-      'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?',
-      [service, section, graph]
-    )
+    data = @graphs.where(service_name: service, section_name: section, graph_name: graph).first
     data && Focuslight::Graph.concrete(data)
   end
 
   def get_by_id(id)
-    data = @db.get_first_row(
-      'SELECT * FROM graphs WHERE id = ?',
-      [id]
-    )
+    data = @graphs[id: id]
     data && Focuslight::Graph.concrete(data)
   end
 
   def get_by_id_for_rrdupdate(id, target=:normal) # get_by_id_for_rrdupdate_short == get_by_id_for_rrdupdate(id, :short)
-    data = @db.get_first_row(
-      'SELECT * FROM graphs WHERE id = ?',
-      [id]
-    )
+    data = @graphs[id: id]
     return nil unless data
     graph = Focuslight::Graph.concrete(data)
 
     subtract = nil
+    tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
+    prev_graphs = @db.from(tablename)
 
-    @db.transaction(:immediate) do |db|
-      tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
+    @db.transaction do
 
-      prev = db.get_first_row(
-        "SELECT * FROM #{tablename} WHERE graph_id = ?", # TODO: if mysql, ' FOR UPDATE'
-        [id]
-      )
+      prev = prev_graphs.where(graph_id: id).first
 
       if !prev
         subtract = 'U'
-        db.execute(
-          "INSERT INTO #{tablename} (graph_id, number, subtract, updated_at) VALUES (?,?,?,?)",
-          [id, graph.number, nil, graph.updated_at_time.to_i]
-        )
-      elsif graph.updated_at_time.to_i != prev['updated_at']
-        subtract = (graph.number - prev['number'].to_i).to_s
-        db.execute(
-          "UPDATE #{tablename} SET number=?, subtract=?, updated_at=? WHERE graph_id = ?",
-          [graph.number, subtract, graph.updated_at_time.to_i, graph.id]
-        )
+        prev_graphs.insert(graph_id: id, number: graph.number, subtract: nil, updated_at: graph.updated_at_time.to_i)
+      elsif graph.updated_at_time != prev[:updated_at]
+        subtract = (graph.number - prev[:number].to_i).to_s
+        prev_graphs.where(graph_id: graph.id).update(number: graph.number, subtract: subtract, updated_at: graph.updated_at_time.to_i)
       else
         if graph.mode == 'gauge' || graph.mode == 'modified'
-          subtract = prev['subtract'] && prev['subtract'].to_s
+          subtract = prev[:subtract] && prev[:subtract].to_s
           subtract = 'U' unless subtract
         else
           subtract = '0'
@@ -99,11 +141,8 @@ class Focuslight::Data
 
   def update(service_name, section_name, graph_name, number, mode, color)
     data = nil
-    @db.transaction do |db|
-      data = db.get_first_row(
-        'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?', # TODO: if mysql, ' FOR UPDATE'
-        [service_name, section_name, graph_name]
-      )
+    @db.transaction do
+      data = @graphs.where(service_name: service_name, section_name: section_name, graph_name: graph_name).first
       if data
         graph = Focuslight::Graph.concrete(data)
         if mode == 'count'
@@ -111,10 +150,7 @@ class Focuslight::Data
         end
         if mode != 'modified' || (mode == 'modified' && graph.number != number)
           color = graph.color if color.empty?
-          db.execute(
-            'UPDATE graphs SET number=?, mode=?, color=?, updated_at=? WHERE id = ?',
-            [number, mode, color, Time.now.to_i, graph.id]
-          )
+          @graphs.where(id: graph.id).update(number: number, mode: mode, color: color, updated_at: Time.now.to_i)
         end
       else
         color = '#' + ['33', '66', '99', 'cc'].shuffle.slice(0,3).join if color.empty?
@@ -123,16 +159,20 @@ class Focuslight::Data
         # PLACEHOLDERS = COLUMNS.map{|c| '?'}
         placeholders = Focuslight::SimpleGraph::PLACEHOLDERS.join(',')
         current_time = Time.now.to_i
-        db.execute(
-          "INSERT INTO graphs (#{columns}) VALUES (#{placeholders})",
-          [service_name, section_name, graph_name, number, mode, color, -1000000000, -100000 , current_time, current_time]
-        )
+        @graphs.insert(
+                       service_name: service_name,
+                       section_name: section_name,
+                       graph_name: graph_name,
+                       number: number,
+                       mode: mode,
+                       color: color,
+                       llimit: -1000000000,
+                       sllimit: -100000,
+                       created_at: current_time,
+                       updated_at: current_time)
       end
 
-      data = db.get_first_row(
-        'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?',
-        [service_name, section_name, graph_name]
-      )
+      data = @graphs.where(service_name: service_name, section_name: section_name, graph_name: graph_name).first
     end # transaction
 
     Focuslight::Graph.concrete(data)
@@ -143,101 +183,77 @@ class Focuslight::Data
     return nil unless graph
 
     graph.update(args)
-    sql = <<SQL
-UPDATE graphs
-  SET service_name=?, section_name=?, graph_name=?,
-      description=?, sort=?, gmode=?, color=?, type=?, stype=?,
-      llimit=?, ulimit=?, sllimit=?, sulimit=?, meta=?
-  WHERE id = ?
-SQL
-    @db.execute(sql,
-      [
-        graph.service, graph.section, graph.graph,
-        graph.description, graph.sort, graph.gmode, graph.color, graph.type, graph.stype,
-        graph.llimit, graph.ulimit, graph.sllimit, graph.sulimit, graph.meta,
-        graph.id
-      ]
-    )
+    @graph.where(id: graph.id)
+      .update(
+              service_name: graph.service,
+              section_name: graph.section,
+              graph_name: graph.graph,
+              description: graph.description,
+              sort: graph.sort,
+              gmode: graph.gmode,
+              color: graph.color,
+              type: graph.type,
+              stype: graph.stype,
+              llimit: graph.llimit,
+              ulimit: graph.ulimit,
+              sllimit: graph.sllimit,
+              sulimit: graph.sulimit,
+              meta: graph.meta
+              )
     true
   end
 
   def update_graph_description(id, description)
-    @db.execute(
-      'UPDATE graphs SET description=? WHERE id = ?',
-      [description, id]
-    )
+    @graphs.where(id: id).update(description: description)
     true
   end
 
   def get_services
-    rows1 = @db.execute('SELECT DISTINCT service_name FROM graphs ORDER BY service_name')
-    rows2 = @db.execute('SELECT DISTINCT service_name FROM complex_graphs ORDER BY service_name')
-    (rows1 + rows2).map{|row| row['service_name']}.uniq.sort
+    rows1 = @graphs.order(:service_name).all
+    rows2 = @complex_graphs.order(:service_name).all
+    (rows1 + rows2).map{|row| row[:service_name]}.uniq.sort
   end
 
   def get_sections(service)
-    rows1 = @db.execute(
-      'SELECT DISTINCT section_name FROM graphs WHERE service_name = ? ORDER BY section_name',
-      [service]
-    )
-    rows2 = @db.execute(
-      'SELECT DISTINCT section_name FROM complex_graphs WHERE service_name = ? ORDER BY section_name',
-      [service]
-    )
-    (rows1 + rows2).map{|row| row['section_name']}.uniq.sort
+    rows1 = @graphs.select(:section_name).order(:section_name).where(service_name: service).all
+    rows2 = @complex_graphs.select(:section_name).order(:section_name).where(service_name: service).all
+    (rows1 + rows2).map{|row| row[:section_name]}.uniq.sort
   end
 
   def get_graphs(service, section)
-    rows1 = @db.execute(
-      'SELECT * FROM graphs WHERE service_name = ? AND section_name = ? ORDER BY sort DESC',
-      [service, section]
-    )
-    rows2 = @db.execute(
-      'SELECT * FROM complex_graphs WHERE service_name = ? AND section_name = ? ORDER BY sort DESC',
-      [service, section]
-    )
+    rows1 = @graphs.order(Sequel.desc(:sort)).where(service_name: service, section_name: section).all
+    rows2 = @complex_graphs.order(Sequel.desc(:sort)).where(service_name: service, section_name: section).all
     (rows1 + rows2).map{|row| Focuslight::Graph.concrete(row)}.sort{|a,b| b.sort <=> a.sort}
   end
 
   def get_all_graph_id
-    @db.execute('SELECT id FROM graphs')
+    @graphs.select(:id).all
   end
 
   def get_all_graph_name
-    sql = <<SQL
-SELECT id,service_name,section_name,graph_name
-  FROM graphs
-  ORDER BY service_name, section_name, graph_name DESC
-SQL
-    @db.execute(sql)
+    @graphs.select(:id, :service_name, :section_name, :graph_name).reverse_order(:service_name, :section_name, :graph_name).all
   end
 
   def get_all_graph_all
-    rows = @db.execute('SELECT * FROM graphs ORDER BY service_name, section_name, graph_name DESC')
-    return [] unless rows
+    rows = @graphs.reverse_order(:service_name, :section_name, :graph_name).all
     rows.map{|row| Focuslight::Graph.concrete(row)}
   end
 
   def remove(id)
-    @db.transaction do |db|
-      db.execute('DELETE FROM graphs WHERE id = ?', id)
-      db.execute('DELETE FROM prev_graphs WHERE graph_id = ?', id)
+    @db.transaction do
+      @graphs.where(id: id).delete
+      prev_graphs = @db.from('prev_graphs')
+      prev_graphs.where(graph_id: id).delete
     end
   end
 
   def get_complex(service, section, graph)
-    data = @db.get_first_row(
-      'SELECT * FROM complex_graphs WHERE service_name = ? AND section_name = ? AND graph_name = ?',
-      [service, section, graph]
-    )
+    data = @complex_graphs.where(service_name: service, section_name: section, graph_name: graph).first
     data && Focuslight::Graph.concrete(data)
   end
 
   def get_complex_by_id(id)
-    data = @db.get_first_row(
-      'SELECT * FROM complex_graphs WHERE id = ?',
-      [id]
-    )
+    data = @complex_graphs.where(id: id).first
     data && Focuslight::Graph.concrete(data)
   end
 
@@ -246,11 +262,16 @@ SQL
     sort = args[:sort]
     meta = Focuslight::ComplexGraph.meta_clean(args).to_json
     now = Time.now.to_i
-    sql = <<SQL
-INSERT INTO complex_graphs (service_name, section_name, graph_name, description, sort, meta,  created_at, updated_at)
-       VALUES (?,?,?,?,?,?,?,?)
-SQL
-    @db.execute(sql, [service, section, graph, description, sort.to_i, meta, now, now])
+    @complex_graphs.insert(
+                           service_name: service,
+                           section_name: section,
+                           graph_name: graph,
+                           description: description,
+                           sort: sort.to_i,
+                           meta: meta,
+                           created_at: now,
+                           updated_at: now,
+                           )
     get_complex(service, section, graph)
   end
 
@@ -259,42 +280,34 @@ SQL
     return nil unless graph
 
     graph.update(args)
-    sql = <<SQL
-UPDATE complex_graphs
-  SET service_name = ?, section_name = ?, graph_name = ?,
-      description = ?, sort = ?, meta = ?, updated_at = ?
-  WHERE id=?
-SQL
-    @db.execute(sql,
-      [
-        graph.service, graph.section, graph.graph,
-        graph.description, graph.sort, graph.meta, Time.now.to_i,
-        graph.id
-      ]
-    )
+    @complex_graphs.where(id: graph.id)
+      .update(
+              service_name: graph.service,
+              section_name: graph.section,
+              graph_name: graph.graph,
+              description: graph.description,
+              sort: graph.sort,
+              meta: graph.meta,
+              updated_at: Time.now.to_i,
+              )
 
     get_complex_by_id(id)
   end
 
   def remove_complex(id)
-    @db.execute('DELETE FROM complex_graphs WHERE id = ?', [id])
+    @complex_graphs.where(id: id).delete
   end
 
   def get_all_complex_graph_id
-    @db.execute('SELECT id FROM complex_graphs')
+    @complex_graphs.select(:id).all
   end
 
   def get_all_complex_graph_name
-    sql = <<SQL
-SELECT id,service_name,section_name,graph_name
-  FROM complex_graphs
-  ORDER BY service_name, section_name, graph_name DESC
-SQL
-    @db.execute(sql)
+    @complex_graphs.select(:id, :service_name, :section_name, :graph_name).reverse_order(:service_name, :section_name, :graph_name).all
   end
 
   def get_all_complex_graph_all
-    rows = @db.execute('SELECT * FROM complex_graphs ORDER BY service_name, section_name, graph_name DESC')
+    rows = @complex_graphs.reverse_order(:service_name, :section_name, :graph_name)
     return [] unless rows
     rows.map{|row| Focuslight::Graph.concrete(row)}
   end

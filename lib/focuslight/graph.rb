@@ -6,7 +6,7 @@ require "json"
 module Focuslight
   class Graph
     def self.concrete(row)
-      if row.has_key?('mode') && row.has_key?('type')
+      if row.has_key?(:mode) && row.has_key?(:type)
         Focuslight::SimpleGraph.new(row)
       else
         Focuslight::ComplexGraph.new(row)
@@ -22,19 +22,19 @@ module Focuslight
     def initialize(row)
       @row_hash = row
 
-      @id = row['id']
-      @service = row['service_name']
-      @section = row['section_name']
-      @graph = row['graph_name']
-      @number = row['number'].to_i # NOT NULL DEFAULT 0
-      @description = row['description'] || ''
-      @sort = row['sort'].to_i # NOT NULL DEFAULT 0
+      @id = row[:id]
+      @service = row[:service_name]
+      @section = row[:section_name]
+      @graph = row[:graph_name]
+      @number = row[:number].to_i # NOT NULL DEFAULT 0
+      @description = row[:description] || ''
+      @sort = row[:sort].to_i # NOT NULL DEFAULT 0
 
-      @meta = row['meta']
+      @meta = row[:meta]
       @parsed_meta = JSON.parse(@meta || '{}', :symbolize_names => true)
 
-      @created_at_time = Time.at(row['created_at'].to_i)
-      @updated_at_time = Time.at(row['updated_at'].to_i)
+      @created_at_time = Time.at(row[:created_at].to_i)
+      @updated_at_time = Time.at(row[:updated_at].to_i)
     end
 
     def path
@@ -109,15 +109,15 @@ module Focuslight
     def initialize(row)
       super
 
-      @mode = row['mode'] || 'gauge' # NOT NULL DEFAULT 'gauge'
-      @gmode = row['gmode'] || 'gauge'
-      @color = row['color'] || '#00CC00' # NOT NULL DEFAULT '#00CC00'
-      @ulimit = row['ulimit'] || 1000000000000000 # NOT NULL DEFAULT 1000000000000000
-      @llimit = row['llimit'] || 0
-      @sulimit = row['sulimit'] || 100000
-      @sllimit = row['sllimit'] || 0
-      @type = row['type'] || 'AREA'
-      @stype = row['stype'] || 'AREA'
+      @mode = row[:mode] || 'gauge' # NOT NULL DEFAULT 'gauge'
+      @gmode = row[:gmode] || 'gauge'
+      @color = row[:color] || '#00CC00' # NOT NULL DEFAULT '#00CC00'
+      @ulimit = row[:ulimit] || 1000000000000000 # NOT NULL DEFAULT 1000000000000000
+      @llimit = row[:llimit] || 0
+      @sulimit = row[:sulimit] || 100000
+      @sllimit = row[:sllimit] || 0
+      @type = row[:type] || 'AREA'
+      @stype = row[:stype] || 'AREA'
 
       @md5 = Digest::MD5.hexdigest(@id.to_s)
 

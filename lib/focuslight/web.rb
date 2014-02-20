@@ -92,10 +92,10 @@ class Focuslight::Web < Sinatra::Base
     end
 
     def number_type_rule
-      case data().number_type
-      when 'REAL'
+      type =  data().number_type
+      if type == Float
         Focuslight::Validator.rule(:real)
-      when 'INT'
+      elsif type == Integer
         Focuslight::Validator.rule(:int)
       else
         raise "unknown number_type #{data().number_type}"
@@ -349,7 +349,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
-    graph_dic = Hash[ graphs.map{|g| [g['id'], g]} ]
+    graph_dic = Hash[ graphs.map{|g| [g[:id], g]} ]
     erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic } #TODO: disable_subtract
   end
 
@@ -470,13 +470,15 @@ class Focuslight::Web < Sinatra::Base
     data = []
     req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
       g = data().get_by_id(id)
+      p g
       next unless g
       g.c_type = type
       g.c_gmode = gmode
       g.stack = !!(stack =~ /^(1|true)$/i)
       data << g
     end
-
+    p data
+    p req_params.hash
     graph_img = rrd().graph(data, req_params.hash)
     [200, {'Content-Type' => 'image/png'}, graph_img]
   end

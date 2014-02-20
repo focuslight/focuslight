@@ -9,6 +9,8 @@ module Focuslight::Config
       ENV.fetch('DATADIR', DEFAULT_DATADIR)
     when :float_support
       ENV.fetch('FLOAT_SUPPORT', false)
+    when :dburl
+      ENV.fetch('DBURL', 'sqlite://data/gforecast.db')
     else
       raise ArgumentError, 'unknown configuration keyword'
     end
