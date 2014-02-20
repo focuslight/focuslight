@@ -5,18 +5,19 @@ require "focuslight/graph"
 require "sequel"
 
 class Focuslight::Data
+
+  DB_URL = Focuslight::Config.get(:dburl)
+  DB = Sequel.connect(DB_URL)
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
-    db_url = Focuslight::Config.get(:dburl)
-    @db = Sequel.connect(db_url)
 
-    if db_url =~ /sqlite/
-      @db.run 'PRAGMA journal_mode = WAL'
-      @db.run 'PRAGMA synchronous = NORMAL'
+    if DB_URL =~ /sqlite/
+      DB.run 'PRAGMA journal_mode = WAL'
+      DB.run 'PRAGMA synchronous = NORMAL'
     end
-    @graphs = @db.from(:graphs)
-    @complex_graphs = @db.from(:complex_graphs)
+    @graphs = DB.from(:graphs)
+    @complex_graphs = DB.from(:complex_graphs)
   end
 
   def number_type
@@ -25,9 +26,9 @@ class Focuslight::Data
 
   def create_tables
     ntype = number_type
-    @db.transaction do
+    DB.transaction do
 
-      @db.create_table :graphs do
+      DB.create_table :graphs do
         primary_key :id
         column :service_name, String, null: false
         column :section_name, String, null: false
@@ -50,7 +51,7 @@ class Focuslight::Data
         unique [:service_name, :section_name, :graph_name]
       end
 
-      @db.create_table :prev_graphs do
+      DB.create_table :prev_graphs do
         column :graph_id, Integer, null: false
         column :number, ntype, default: 0, null: false
         column :subtract, ntype
@@ -58,7 +59,7 @@ class Focuslight::Data
         primary_key [:graph_id]
       end
 
-      @db.create_table :prev_short_graphs do
+      DB.create_table :prev_short_graphs do
         column :graph_id, Integer, null: false
         column :number, ntype, default: 0, null: false
         column :subtract, ntype
@@ -66,7 +67,7 @@ class Focuslight::Data
         primary_key [:graph_id]
       end
 
-      @db.create_table :complex_graphs do
+      DB.create_table :complex_graphs do
         primary_key :id
         column :service_name, String, null: false
         column :section_name, String, null: false
@@ -83,12 +84,12 @@ class Focuslight::Data
   end
 
   def execute(*args)
-    @db.run(*args)
+    DB.run(*args)
   end
 
   def transaction
-    @db.transaction do
-      yield @db
+    DB.transaction do
+      yield DB
     end
   end
 
@@ -109,9 +110,9 @@ class Focuslight::Data
 
     subtract = nil
     tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
-    prev_graphs = @db.from(tablename)
+    prev_graphs = DB.from(tablename)
 
-    @db.transaction do
+    DB.transaction do
 
       prev = prev_graphs.where(graph_id: id).first
 
@@ -141,7 +142,7 @@ class Focuslight::Data
 
   def update(service_name, section_name, graph_name, number, mode, color)
     data = nil
-    @db.transaction do
+    DB.transaction do
       data = @graphs.where(service_name: service_name, section_name: section_name, graph_name: graph_name).first
       if data
         graph = Focuslight::Graph.concrete(data)
@@ -240,9 +241,9 @@ class Focuslight::Data
   end
 
   def remove(id)
-    @db.transaction do
+    DB.transaction do
       @graphs.where(id: id).delete
-      prev_graphs = @db.from('prev_graphs')
+      prev_graphs = DB.from('prev_graphs')
       prev_graphs.where(graph_id: id).delete
     end
   end
