@@ -96,28 +96,6 @@
   </div>
 </div>
 
-<div class="form-group">
-  <label for="" class="control-label col-sm-3">Mode of subtract Graph</label>
-  <div class="col-sm-4">
-    <select name="stype" class="form-control">
-      <option value="AREA" <%=  selected?(graph.stype, 'AREA') %>>AREA</option>
-      <option value="LINE1" <%= selected?(graph.stype, 'LINE1') %>>LINE</option>
-      <option value="LINE2" <%= selected?(graph.stype, 'LINE2') %>>LINE(Bold)</option>
-    </select>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="" class="control-label col-sm-3">Effective range of subtract Graph</label>
-  <div class="col-sm-6">
-    <div class="input-group">
-      <input type="text" class="form-control" name="sllimit" value="<%= graph.sllimit %>" />
-      <span class="input-group-static">〜</span>
-      <input type="text" class="form-control" name="sulimit" value="<%= graph.sulimit %>" />
-    </div>
-  </div>
-</div>
-
 </fieldset>
 
 <hr />

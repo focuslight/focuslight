@@ -239,7 +239,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-      erb :edit, layout: :base, locals: { pathinfo: [nil,nil,nil,nil,:edit], graph: request.stash[:graph] } # TODO: disable_subtract
+      erb :edit, layout: :base, locals: { pathinfo: [nil,nil,nil,nil,:edit], graph: request.stash[:graph] }
   end
 
   post '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
@@ -255,11 +255,8 @@ class Focuslight::Web < Sinatra::Base
       unit: { default: '' },
       color: { rule: [ rule(:not_blank), rule(:regexp, /^#[0-9a-f]{6}$/i) ] },
       type:  { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
-      stype: { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
       llimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
       ulimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
-      sllimit: { rule: [ rule(:not_blank), number_type_rule() ] },
-      sulimit: { rule: [ rule(:not_blank), number_type_rule() ] },
     }
     req_params = validate(params, edit_graph_spec)
 
@@ -292,7 +289,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/add_complex' do
     graphs = data().get_all_graph_name
-    erb :add_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :add_complex], params: params, graphs: graphs } #TODO: disable_subtract
+    erb :add_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :add_complex], params: params, graphs: graphs }
   end
 
   complex_graph_request_spec_generator = ->(type2s_num){
@@ -350,7 +347,7 @@ class Focuslight::Web < Sinatra::Base
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
     graph_dic = Hash[ graphs.map{|g| [g[:id], g]} ]
-    erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic } #TODO: disable_subtract
+    erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic }
   end
 
   post '/edit_complex/:complex_id', :graph => :complex do

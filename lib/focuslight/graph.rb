@@ -97,14 +97,13 @@ module Focuslight
   end
 
   class SimpleGraph < Graph
-    COLUMNS = %w(service_name section_name graph_name number mode color llimit sllimit created_at updated_at)
+    COLUMNS = %w(service_name section_name graph_name number mode color llimit created_at updated_at)
     PLACEHOLDERS = COLUMNS.map{|c| '?'}
 
-    attr_accessor :mode, :gmode, :color, :ulimit, :llimit, :sulimit, :sllimit, :type, :stype
+    attr_accessor :mode, :gmode, :color, :ulimit, :llimit, :type
 
     attr_reader :md5
     attr_accessor :adjust, :adjustval, :unit
-    attr_accessor :subtract, :subtract_short
 
     def initialize(row)
       super
@@ -114,25 +113,20 @@ module Focuslight
       @color = row[:color] || '#00CC00' # NOT NULL DEFAULT '#00CC00'
       @ulimit = row[:ulimit] || 1000000000000000 # NOT NULL DEFAULT 1000000000000000
       @llimit = row[:llimit] || 0
-      @sulimit = row[:sulimit] || 100000
-      @sllimit = row[:sllimit] || 0
       @type = row[:type] || 'AREA'
-      @stype = row[:stype] || 'AREA'
 
       @md5 = Digest::MD5.hexdigest(@id.to_s)
 
       @adjust = @parsed_meta.fetch(:adjust, '*')
       @adjustval = @parsed_meta.fetch(:adjustval, '1')
       @unit = @parsed_meta.fetch(:unit, '')
-
-      @subtract = @subtract_short = nil
     end
 
     def to_hash
       simple = {
         mode: @mode, gmode: @gmode, color: @color,
-        ulimit: @ulimit, llimit: @llimit, sulimit: @sulimit, sllimit: @sllimit,
-        type: @type, stype: @stype,
+        ulimit: @ulimit, llimit: @llimit,
+        type: @type,
         adjust: @adjust, adjustval: @adjustval, unit: @unit,
         complex: false,
         md5: @md5, meta: @meta,
@@ -157,10 +151,7 @@ module Focuslight
         when :color then @color = v
         when :ulimit then @ulimit = v
         when :llimit then @llimit = v
-        when :sulimit then @sulimit = v
-        when :sllimit then @sllimit = v
         when :type then @type = v
-        when :stype then @stype = v
         else
           meta[k.to_sym] = v
         end
@@ -172,7 +163,7 @@ module Focuslight
     def self.meta_clean(args={})
       args.delete_if do |k,v|
         %w(id service_name section_name graph_name number
-           description sort mode gmode color ulimit llimit sulimit sllimit type stype).include?(k.to_s)
+           description sort mode gmode color ulimit llimit type).include?(k.to_s)
       end
     end
   end

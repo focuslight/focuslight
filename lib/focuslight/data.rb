@@ -41,10 +41,7 @@ class Focuslight::Data
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
-        column :sulimit, ntype, default: 100000, null: false
-        column :sllimit, ntype, default: 0, null: false
         column :type, String, default: "AREA", null: false
-        column :stype, String, default: "AREA", null: false
         String :meta, text: true
         column :created_at, Bignum, null: false
         column :updated_at, Bignum, null: false
@@ -108,7 +105,7 @@ class Focuslight::Data
         end
       else
         color = '#' + ['33', '66', '99', 'cc'].shuffle.slice(0,3).join if color.empty?
-        # COLUMNS = %w(service_name section_name graph_name number mode color llimit sllimit created_at updated_at)
+        # COLUMNS = %w(service_name section_name graph_name number mode color llimit created_at updated_at)
         columns = Focuslight::SimpleGraph::COLUMNS.join(',')
         # PLACEHOLDERS = COLUMNS.map{|c| '?'}
         placeholders = Focuslight::SimpleGraph::PLACEHOLDERS.join(',')
@@ -121,7 +118,6 @@ class Focuslight::Data
                        mode: mode,
                        color: color,
                        llimit: -1000000000,
-                       sllimit: -100000,
                        created_at: current_time,
                        updated_at: current_time)
       end
@@ -147,11 +143,8 @@ class Focuslight::Data
               gmode: graph.gmode,
               color: graph.color,
               type: graph.type,
-              stype: graph.stype,
               llimit: graph.llimit,
               ulimit: graph.ulimit,
-              sllimit: graph.sllimit,
-              sulimit: graph.sulimit,
               meta: graph.meta
               )
     true

@@ -10,7 +10,6 @@ Focuslight is compatible with:
 
 Focuslight is currently lacking some GrowthForecast features:
  * MySQL support
- * Disabling Subtract
 
 ## Prerequisites
 
