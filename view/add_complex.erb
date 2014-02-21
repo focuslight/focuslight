@@ -71,7 +71,7 @@
 </select></td>
 <td><select name="path-1" class="form-control">
 <% graphs.each do |row| %>
-<option value="<%= row['id'] %>">/<%= row['service_name'] %>/<%= row['section_name'] %>/<%= row['graph_name'] %></option>
+<option value="<%= row[:id] %>">/<%= row[:service_name] %>/<%= row[:section_name] %>/<%= row[:graph_name] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-1" class="form-control">
@@ -106,7 +106,7 @@
 </select></t>
 <td><select name="path-add" id="path-add" class="form-control">
 <% graphs.each do |row| %>
-<option value="<%= row['id'] %>">/<%= row['service_name'] %>/<%= row['section_name'] %>/<%= row['graph_name'] %></option>
+<option value="<%= row[:id] %>">/<%= row[:service_name] %>/<%= row[:section_name] %>/<%= row[:graph_name] %></option>
 <% end %>
 </select></td>
 <td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
