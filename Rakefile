@@ -16,6 +16,15 @@ task :init => :dotenv do
   Focuslight::Init.run
 end
 
+task :console => :dotenv do
+  require "focuslight/init"
+  require 'irb'
+  # require 'irb/completion'
+  ARGV.clear
+  IRB.start
+end
+task :c => :console
+
 task :longer => :dotenv do
   Focuslight::Worker.run(interval: 300, target: :normal)
 end
