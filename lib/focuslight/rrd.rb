@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 require "focuslight"
-require "focuslight/config"
 require "focuslight/graph"
 
 require "time"

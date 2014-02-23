@@ -1,5 +1,4 @@
 require "focuslight"
-require "focuslight/config"
 require "focuslight/graph"
 require "sequel"
 

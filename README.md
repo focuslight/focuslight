@@ -70,6 +70,7 @@ DBURL=sqlite://data/gforecast.db
 # DBURL=mysql2://root:@localhost/focuslight
 # RRDCACHED=n
 # MOUNT=/
+LOG_LEVEL=warn
 ```
 
 ## Switch from GrowthForecast
