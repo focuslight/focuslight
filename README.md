@@ -10,9 +10,6 @@ Focuslight is compatible with:
  * almost all of features, except for:
    * `subtract` support (`gmode`, `stype`, `sllimit`, `sulimit` parameters)
 
-Focuslight is currently lacking some GrowthForecast features:
- * MySQL support
-
 ## Prerequisites
 
 RRDTool and its dependencies must be installed before installing Focuslight.
@@ -28,6 +25,8 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 
 Install focuslight with Ruby 2.0 or later. Execute after installation.
 
+### Using SQLite:
+
 1. clone this repository
 1. `cd focuslight`
 1. install dependencies: `bundle install`
@@ -35,6 +34,21 @@ Install focuslight with Ruby 2.0 or later. Execute after installation.
 1. execute: `bundle exec foreman start`
 
 See `http://localhost:5125/`
+
+### Using MySQL:
+
+You need to change DBURL parameter on .env file to `mysql2` version. 
+You may also configure the database name, the user name, and the password. See the Configuration section. 
+
+Then, create the database and assign permissions to the user as
+
+```
+mysql> CREATE DATABASE focuslight;
+mysql> GRANT  CREATE, ALTER, DELETE, INSERT, UPDATE, SELECT \\
+  ON focuslight.* TO 'user'\@'localhost' IDENTIFIED BY password;
+```
+
+Then, do the same thing with SQLite case. 
 
 ## Configuration
 
@@ -49,8 +63,9 @@ HOST=0.0.0.0
 # FRONT_PROXY
 # ALLOW_FROM
 # 1MIN_METRICS=n
-FLOAT_SUPPORT=n
-# MYSQL=n
+FLOAT_SUPPORT=n # y
+DBURL=sqlite://data/gforecast.db
+# DBURL=mysql2://root:@localhost/focuslight
 # RRDCACHED=n
 # MOUNT=/
 ```
@@ -64,7 +79,6 @@ FLOAT_SUPPORT=n
 
 * Merge GrowthForecast's commits after Jan 09, 2014
   * api endpoint link label
-* MySQL support
 * RRDCached support
 * Front proxies and source address restrictions
 * HTTP API mount point support

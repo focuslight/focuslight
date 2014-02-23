@@ -24,7 +24,7 @@ class Focuslight::Worker
   end
 
   def data
-    @data ||= Focuslight::Data.new #TODO mysql support
+    @data ||= Focuslight::Data.new
   end
 
   def rrd

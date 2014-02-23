@@ -78,7 +78,7 @@ class Focuslight::Web < Sinatra::Base
     end
 
     def data
-      @data ||= Focuslight::Data.new #TODO mysql support
+      @data ||= Focuslight::Data.new
     end
 
     def number_type_rule
