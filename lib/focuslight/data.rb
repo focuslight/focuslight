@@ -1,13 +1,11 @@
 require "focuslight"
 require "focuslight/config"
 require "focuslight/graph"
-
 require "sequel"
 
-class Focuslight::Data
+DB = Sequel.connect(Focuslight::Config.get(:dburl))
 
-  # TODO: A connection per request via Sequel::ConnectionPool would be better with MySQL
-  DB = Sequel.connect(Focuslight::Config.get(:dburl))
+class Focuslight::Data
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
@@ -21,7 +19,7 @@ class Focuslight::Data
   end
 
   def number_type
-    @floatings ? Float : Integer
+    @floatings ? Float : Bignum
   end
 
   def create_tables
@@ -29,14 +27,14 @@ class Focuslight::Data
     DB.transaction do
 
       DB.create_table :graphs do
-        primary_key :id
+        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :mode, String, default: "gauge", null: false
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: "", null: false
+        column :sort, Bignum, default: 0, null: false
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
@@ -48,13 +46,13 @@ class Focuslight::Data
       end
 
       DB.create_table :complex_graphs do
-        primary_key :id
+        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: "", null: false
+        column :sort, Bignum, default: 0, null: false
         String :meta, text: true
         column :created_at, Bignum, null: false
         column :updated_at, Bignum, null: false
