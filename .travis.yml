@@ -1,0 +1,9 @@
+rvm:
+  - 2.0.0
+  - 2.1.0
+gemfile:
+  - Gemfile
+before_install:
+  - sudo apt-get install rrdtool librrd-dev
+before_script:
+  - bundle exec rake init

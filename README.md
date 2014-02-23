@@ -1,5 +1,7 @@
 # Focuslight
 
+[![Build Status](https://travis-ci.org/focuslight/focuslight.png?branch=master)](https://travis-ci.org/focuslight/focuslight)
+
 Focuslight is a lightning Fast Graphing/Visualization tool, built on RRDTool. It is a Ruby clone of [GrowthForecast](http://kazeburo.github.io/GrowthForecast/).
 
 Focuslight is compatible with:
@@ -17,7 +19,7 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 * RHEL/CentOS 6.x
   * Add `epel` repository, then `sudo yum install rrdtool rrdtool-devel`
 * Ubuntu
-  * `sudo apt-get rrdtool`
+  * `sudo apt-get install rrdtool librrd-dev`
 * OSX
   * `brew install rrdtool`
 
