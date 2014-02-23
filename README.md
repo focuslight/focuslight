@@ -1,7 +1,5 @@
 # Focuslight
 
-[![Build Status](https://secure.travis-ci.org/focuslight/focuslight.png?branch=master)](http://travis-ci.org/focuslight/focuslight)
-
 Focuslight is a lightning Fast Graphing/Visualization tool, built on RRDTool. It is a Ruby clone of [GrowthForecast](http://kazeburo.github.io/GrowthForecast/).
 
 Focuslight is compatible with:
