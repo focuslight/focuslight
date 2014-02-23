@@ -3,7 +3,7 @@ require "focuslight/config"
 require "focuslight/graph"
 require "sequel"
 
-DB = Sequel.connect(Focuslight::Config.get(:dburl))
+DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: $logger)
 
 class Focuslight::Data
   def initialize

@@ -43,6 +43,7 @@ class Focuslight::Worker
     Signal.trap(:PIPE, "IGNORE")
 
     update_next!
+    $logger.info("[#{@target}] first updater start in #{@next_time}")
 
     childpid = nil
     while sleep(0.5) do
@@ -50,37 +51,41 @@ class Focuslight::Worker
         begin
           if Process.waitpid(childpid, Process::WNOHANG)
             #TODO: $? (Process::Status object)
+            $logger.debug("[#{@target}] update finished pid: #{childpid}, code: #{$? >> 8}")
+            $logger.debug("[#{@target}] next rader start in #{@next_time}")
             childpid = nil
           end
         rescue Errno::ECHILD
+          $logger.warn("[#{@target}] no child process");
           childpid = nil
         end
       end
 
       unless @signals.empty?
-        # signal received
+        $logger.warn("[#{@target}] signals_received: #{@signals.join(',')}")
         break
       end
 
       next if Time.now < @next_time
       update_next!
+      $logger.debug("[#{@target}] (#{@next_time}) updater start")
 
       if childpid
-        # TODO: previous radar exists, skip
+        $logger.warn("[#{@target}] Previous radar exists, skipping this time")
         next
       end
 
       childpid = fork do
         graphs = data().get_all_graph_all()
         graphs.each do |graph|
-          # ToDo: logger.debug("[#{@target}] update #{graph.id}")
+          $logger.debug("[#{@target}] update #{graph.id}")
           rrd().update(graph, @target)
         end
       end
     end
 
     if childpid
-      # waiting for updater child process
+      $logger.warn("[#{@target}] waiting for updater process finishing")
       begin
         waitpid childpid
       rescue Errno::ECHILD
