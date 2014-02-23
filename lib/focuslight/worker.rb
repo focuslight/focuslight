@@ -71,9 +71,9 @@ class Focuslight::Worker
       end
 
       childpid = fork do
-        # TODO: disable subtract
-        data().get_all_graph_id().each do |row|
-          graph = data().get_by_id_for_rrdupdate(row[:id], @target)
+        graphs = data().get_all_graph_all()
+        graphs.each do |graph|
+          # ToDo: logger.debug("[#{@target}] update #{graph.id}")
           rrd().update(graph, @target)
         end
       end

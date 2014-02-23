@@ -18,7 +18,6 @@ class Focuslight::RRD
     [
       '--step', '300',
       "DS:num:#{dst}:600:U:U",
-      "DS:sub:#{dst}:600:U:U",
       'RRA:AVERAGE:0.5:1:1440', # 5mins, 5days
       'RRA:AVERAGE:0.5:6:1008', # 30mins, 21days
       'RRA:AVERAGE:0.5:24:1344', # 2hours, 112days
@@ -34,7 +33,6 @@ class Focuslight::RRD
     [
       '--step', '60',
       "DS:num:#{dst}:120:U:U",
-      "DS:sub:#{dst}:120:U:U",
       'RRA:AVERAGE:0.5:1:4800', # 1min, 3days(80hours)
       'RRA:MAX:0.5:1:4800', # 1min, 3days(80hours)
     ]
@@ -63,15 +61,10 @@ class Focuslight::RRD
 
   def update(graph, target=:normal)
     file = path(graph, target)
-    subtract = if target == :short
-                 graph.subtract_short
-               else
-                 graph.subtract
-               end
     options = [
       file,
-      '-t', 'num:sub',
-      '--', ['N', graph.number, subtract].join(':')
+      '-t', 'num',
+      '--', ['N', graph.number].join(':')
     ]
     ## TODO: rrdcached
     # if ( $self->{rrdcached} ) {
@@ -156,7 +149,6 @@ class Focuslight::RRD
 
   def graph(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args[:gmode]
     span = args.fetch(:t, :d)
     from = args[:from]
     to = args[:to]
@@ -164,10 +156,6 @@ class Focuslight::RRD
     height = args.fetch(:height, 110)
 
     period_title, period, period_end, xgrid = calc_period(span, from, to)
-
-    if datas.size == 1 && a_gmode == 'subtract'
-      period_title = "[subtract] #{period_title}"
-    end
 
     tmpfile = Tempfile.new(["", ".png"]) # [basename_prefix, suffix]
     rrdoptions = [
@@ -206,11 +194,10 @@ class Focuslight::RRD
 
     defs = []
     datas.each_with_index do |data, i|
-      gmode = data.c_gmode ? data.c_gmode : a_gmode
-      type  = data.c_type ? data.c_type : (gmode == 'subtract' ? data.stype : data.type)
-      gdata =  (gmode == 'subtract' ? 'sub' : 'num')
-      llimit = (gmode == 'subtract' ? data.sllimit : data.llimit)
-      ulimit = (gmode == 'subtract' ? data.sulimit : data.ulimit)
+      type  = data.c_type ? data.c_type : data.type
+      gdata =  'num'
+      llimit = data.llimit
+      ulimit = data.ulimit
       stack = (data.stack && i > 0 ? ':STACK' : '')
       file = (span =~ /^s/ ? path(data, :short) : path(data, :long))
       unit = (data.unit || '').gsub('%', '%%')
@@ -313,7 +300,6 @@ class Focuslight::RRD
 
   def export(datas, args)
     datas = [datas] unless datas.is_a?(Array)
-    a_gmode = args[:gmode]
     span = args.fetch(:t, 'd')
     from = args[:from]
     to = args[:to]
@@ -332,11 +318,10 @@ class Focuslight::RRD
 
     defs = []
     datas.each_with_index do |data, i|
-      gmode = data.c_gmode ? data.c_gmode : a_gmode
-      type  = data.c_type ? data.c_type : (gmode == 'subtract' ? data.stype : data.type)
-      gdata =  (gmode == 'subtract' ? 'sub' : 'num')
-      llimit = (gmode == 'subtract' ? data.sllimit : data.llimit)
-      ulimit = (gmode == 'subtract' ? data.sulimit : data.ulimit)
+      type  = data.c_type ? data.c_type : data.type
+      gdata =  'num'
+      llimit = data.llimit
+      ulimit = data.ulimit
       stack = (data.stack && i > 0 ? ':STACK' : '')
       file = (span =~ /^s/ ? path(data, :short) : path(data, :long))
 

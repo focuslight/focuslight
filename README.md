@@ -7,10 +7,11 @@ Focuslight is compatible with:
    * database (sqlite) and graphs (rrdtool)
  * almost all HTTP API requests, except for:
    * `export` support
+ * almost all of features, except for:
+   * `subtract` support (`gmode`, `stype`, `sllimit`, `sulimit` parameters)
 
 Focuslight is currently lacking some GrowthForecast features:
  * MySQL support
- * Disabling Subtract
 
 ## Prerequisites
 
@@ -62,7 +63,6 @@ FLOAT_SUPPORT=n
 ## TODO
 
 * Merge GrowthForecast's commits after Jan 09, 2014
-  * disabling subtract
   * api endpoint link label
 * MySQL support
 * RRDCached support
@@ -71,6 +71,35 @@ FLOAT_SUPPORT=n
 * Daemonize support
 * Installation from rubygems.org
 * Add tests, and tests, and more tests
+
+## Imcompatible Features
+
+Focuslight has following incompatibilitie with GrowthForecast as specifications.
+
+### Subtract
+
+[GrowthForecast](http://kazeburo.github.io/GrowthForecast/index.html) has subtract graph support (gmode=subtract),
+but focuslight does not have it because subtract graphs can be created using mode=derive like:
+
+```
+curl -d "number=10&mode=derive" http://localhost:5125/api/service/section/graph
+```
+
+As a demo, you may run following shell codes.
+The number is incremental, but derive graph shows you the difference as a graph, which results in 1 in this demo.
+
+```
+number=1
+while true; do
+  curl -d "number=${number}&mode=derive" http://localhost:5125/api/service/section/graph
+  number=$((number+1))
+  sleep 60
+done
+```
+
+In addition, because focuslight does not support subtract graphs, `gmode`, `stype`, `sllimit`, and `sulimit`
+parameters on HTTP APIs are not available. In the case of POST (create, edit), they are ignored.
+In the case of GET, they are not returned.
 
 ## Contributing
 

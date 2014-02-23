@@ -76,10 +76,6 @@
 <option value="<%= graph[:id] %>" <%= selected?(first_row[:path], graph[:id]) %>>/<%= graph[:service_name] %>/<%= graph[:section_name] %>/<%= graph[:graph_name] %></option>
 <% end %>
 </select></td>
-<td style="text-align: center"><select name="gmode-1" class="form-control">
-<option value="gauge" <%= selected?(first_row[:mode], 'gauge') %>>Gauge</option>
-<option value="subtract" <%= selected?(first_row[:mode], 'subtract') %>>Subtract</option>
-</select></td>
 </tr>
 </table>
 </div>
@@ -111,10 +107,6 @@
 <option value="<%= graph[:id] %>" <%= selected?(first_row[:path], graph[:id]) %>>/<%= graph[:service_name] %>/<%= graph[:section_name] %>/<%= graph[:graph_name] %></option>
 <% end %>
 </select></td>
-<td style="text-align: center"><select name="gmode-add" id="gmode-add" class="form-control">
-<option value="gauge">Gauge</option>
-<option value="subtract">Subtract</option>
-</select></td>
 <td style="text-align:center;"><select name="stack-add" id="stack-add" class="form-control">
 <option value="1">enable</option>
 <option value="0">disable</option>
@@ -129,7 +121,6 @@
 <td><%= case row[:type] when 'AREA' then 'AREA' when 'LINE1' then 'LINE' else 'LINE(Bold)' end %><input type="hidden" name="type-2[]" value="<%= row[:type] %>"/></td>
 <% graph = dic[row[:graph_id]] %>
 <td>/<%= graph[:service_name] %>/<%= graph[:section_name] %>/<%= graph[:graph_name] %><input type="hidden" name="path-2[]" value="<%= row[:path] %>"/></td>
-<td style="text-align:center"><%= row[:gmode] == 'gauge' ? 'Gauge' : 'Subtract' %><input type="hidden" name="gmode-2[]" value="<%= row[:gmode] %>" /></td>
 <td style="text-align:center"><%= row[:stack] ? 'enable' : 'disable' %><input type="hidden" name="stack-2[]" value="<%= row[:stack] ? 1 : 0 %>" /></td>
 <td style="text-align:center"><span class="table-order-remove">✖</span></td>
 </tr>

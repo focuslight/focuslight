@@ -37,34 +37,14 @@ class Focuslight::Data
         column :mode, String, default: "gauge", null: false
         column :description, String, default: "", null: false
         column :sort, Bignum, default: "", null: false
-        column :gmode, String, default: "gauge", null: false
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
-        column :sulimit, ntype, default: 100000, null: false
-        column :sllimit, ntype, default: 0, null: false
         column :type, String, default: "AREA", null: false
-        column :stype, String, default: "AREA", null: false
         String :meta, text: true
         column :created_at, Bignum, null: false
         column :updated_at, Bignum, null: false
         unique [:service_name, :section_name, :graph_name]
-      end
-
-      DB.create_table :prev_graphs do
-        column :graph_id, Integer, null: false
-        column :number, ntype, default: 0, null: false
-        column :subtract, ntype
-        column :updated_at, Bignum, null: false
-        primary_key [:graph_id]
-      end
-
-      DB.create_table :prev_short_graphs do
-        column :graph_id, Integer, null: false
-        column :number, ntype, default: 0, null: false
-        column :subtract, ntype
-        column :updated_at, Bignum, null: false
-        primary_key [:graph_id]
       end
 
       DB.create_table :complex_graphs do
@@ -107,37 +87,6 @@ class Focuslight::Data
     data = @graphs[id: id]
     return nil unless data
     graph = Focuslight::Graph.concrete(data)
-
-    subtract = nil
-    tablename = (target == :short ? 'prev_short_graphs' : 'prev_graphs')
-    prev_graphs = DB.from(tablename)
-
-    DB.transaction do
-
-      prev = prev_graphs.where(graph_id: id).first
-
-      if !prev
-        subtract = 'U'
-        prev_graphs.insert(graph_id: id, number: graph.number, subtract: nil, updated_at: graph.updated_at_time.to_i)
-      elsif graph.updated_at_time != prev[:updated_at]
-        subtract = (graph.number - prev[:number].to_i).to_s
-        prev_graphs.where(graph_id: graph.id).update(number: graph.number, subtract: subtract, updated_at: graph.updated_at_time.to_i)
-      else
-        if graph.mode == 'gauge' || graph.mode == 'modified'
-          subtract = prev[:subtract] && prev[:subtract].to_s
-          subtract = 'U' unless subtract
-        else
-          subtract = '0'
-        end
-      end
-    end # commit
-
-    if target == :short
-      graph.subtract_short = subtract
-    else
-      graph.subtract = subtract
-    end
-    graph
   end
 
   def update(service_name, section_name, graph_name, number, mode, color)
@@ -155,7 +104,7 @@ class Focuslight::Data
         end
       else
         color = '#' + ['33', '66', '99', 'cc'].shuffle.slice(0,3).join if color.empty?
-        # COLUMNS = %w(service_name section_name graph_name number mode color llimit sllimit created_at updated_at)
+        # COLUMNS = %w(service_name section_name graph_name number mode color llimit created_at updated_at)
         columns = Focuslight::SimpleGraph::COLUMNS.join(',')
         # PLACEHOLDERS = COLUMNS.map{|c| '?'}
         placeholders = Focuslight::SimpleGraph::PLACEHOLDERS.join(',')
@@ -168,7 +117,6 @@ class Focuslight::Data
                        mode: mode,
                        color: color,
                        llimit: -1000000000,
-                       sllimit: -100000,
                        created_at: current_time,
                        updated_at: current_time)
       end
@@ -191,14 +139,10 @@ class Focuslight::Data
               graph_name: graph.graph,
               description: graph.description,
               sort: graph.sort,
-              gmode: graph.gmode,
               color: graph.color,
               type: graph.type,
-              stype: graph.stype,
               llimit: graph.llimit,
               ulimit: graph.ulimit,
-              sllimit: graph.sllimit,
-              sulimit: graph.sulimit,
               meta: graph.meta
               )
     true
@@ -243,8 +187,6 @@ class Focuslight::Data
   def remove(id)
     DB.transaction do
       @graphs.where(id: id).delete
-      prev_graphs = DB.from('prev_graphs')
-      prev_graphs.where(graph_id: id).delete
     end
   end
 

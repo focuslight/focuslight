@@ -23,16 +23,6 @@ class Focuslight::Web < Sinatra::Base
     Focuslight::Validator.rule(*args)
   end
 
-  ### TODO: both of static method and helper method
-  def self.gmode_choice
-    ['gauge', 'subtract'] #TODO: disable_subtract
-  end
-
-  ### TODO: both of static method and helper method
-  def self.gmode_choice_edit_graph
-    ['gauge', 'subtract', 'both'] #TODO: disable_subtract
-  end
-
   configure do
     datadir = Focuslight::Config.get(:datadir)
     FileUtils.mkdir_p(datadir)
@@ -104,14 +94,6 @@ class Focuslight::Web < Sinatra::Base
 
     def rrd
       @rrd ||= Focuslight::RRD.new
-    end
-
-    def gmode_choice
-      ['gauge', 'subtract'] #TODO: disable_subtract
-    end
-
-    def gmode_choice_edit_graph
-      ['gauge', 'subtract', 'both'] #TODO: disable_subtract
     end
 
     # short interval update is always enabled in focuslight
@@ -239,7 +221,7 @@ class Focuslight::Web < Sinatra::Base
   end
 
   get '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
-      erb :edit, layout: :base, locals: { pathinfo: [nil,nil,nil,nil,:edit], graph: request.stash[:graph] } # TODO: disable_subtract
+      erb :edit, layout: :base, locals: { pathinfo: [nil,nil,nil,nil,:edit], graph: request.stash[:graph] }
   end
 
   post '/edit/:service_name/:section_name/:graph_name', :graph => :simple do
@@ -249,17 +231,13 @@ class Focuslight::Web < Sinatra::Base
       graph_name:  { rule: rule(:not_blank) },
       description: { default: '' },
       sort:  { rule: [ rule(:not_blank), rule(:int_range, 0..19) ] },
-      gmode: { rule: [ rule(:not_blank), rule(:choice, gmode_choice_edit_graph()) ] },
       adjust:    { default: '*', rule: [ rule(:not_blank), rule(:choice, '*', '/') ] },
       adjustval: { default: '1', rule: [ rule(:not_blank), rule(:natural) ] },
       unit: { default: '' },
       color: { rule: [ rule(:not_blank), rule(:regexp, /^#[0-9a-f]{6}$/i) ] },
       type:  { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
-      stype: { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
       llimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
       ulimit:  { rule: [ rule(:not_blank), number_type_rule() ] },
-      sllimit: { rule: [ rule(:not_blank), number_type_rule() ] },
-      sulimit: { rule: [ rule(:not_blank), number_type_rule() ] },
     }
     req_params = validate(params, edit_graph_spec)
 
@@ -292,7 +270,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/add_complex' do
     graphs = data().get_all_graph_name
-    erb :add_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :add_complex], params: params, graphs: graphs } #TODO: disable_subtract
+    erb :add_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :add_complex], params: params, graphs: graphs }
   end
 
   complex_graph_request_spec_generator = ->(type2s_num){
@@ -305,7 +283,6 @@ class Focuslight::Web < Sinatra::Base
       sort:  { rule: [ rule(:not_blank), rule(:int_range, 0..19) ] },
       'type-1'.to_sym =>  { rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ] },
       'path-1'.to_sym =>  { rule: [ rule(:not_blank), rule(:natural) ] },
-      'gmode-1'.to_sym => { rule: [ rule(:not_blank), rule(:choice, gmode_choice()) ] },
       'type-2'.to_sym => {
         array: true, size: (type2s_num..type2s_num),
         rule: [ rule(:not_blank), rule(:choice, 'AREA', 'LINE1', 'LINE2') ],
@@ -313,10 +290,6 @@ class Focuslight::Web < Sinatra::Base
       'path-2'.to_sym => {
         array: true, size: (type2s_num..type2s_num),
         rule: [ rule(:not_blank), rule(:natural) ],
-      },
-      'gmode-2'.to_sym => {
-        array: true, size: (type2s_num..type2s_num),
-        rule: [ rule(:not_blank), rule(:choice, gmode_choice()) ],
       },
       'stack-2'.to_sym => {
         array: true, size: (type2s_num..type2s_num),
@@ -350,7 +323,7 @@ class Focuslight::Web < Sinatra::Base
   get '/edit_complex/:complex_id', :graph => :complex do
     graphs = data().get_all_graph_name
     graph_dic = Hash[ graphs.map{|g| [g[:id], g]} ]
-    erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic } #TODO: disable_subtract
+    erb :edit_complex, layout: :base, locals: { pathinfo: [nil, nil, nil, nil, :edit_complex], complex: request.stash[:graph], graphs: graphs, dic: graph_dic }
   end
 
   post '/edit_complex/:complex_id', :graph => :complex do
@@ -389,7 +362,6 @@ class Focuslight::Web < Sinatra::Base
     graph_name: not_specified_or_not_whitespece,
     complex: not_specified_or_not_whitespece,
     t: { default: 'd', rule: rule(:choice, 'd', 'h', 'm', 'sh', 'sd') },
-    gmode: { default: 'gauge', rule: rule(:choice, gmode_choice()) },
     from: {
       default: (Time.now - 86400*8).strftime('%Y/%m/%d %T'),
       rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
@@ -429,7 +401,6 @@ class Focuslight::Web < Sinatra::Base
     request.stash[:graph].data_rows.each do |row|
       g = data().get_by_id(row[:graph_id])
       g.c_type = row[:type]
-      g.c_gmode = row[:gmode]
       g.stack = row[:stack]
       data << g
     end
@@ -445,7 +416,6 @@ class Focuslight::Web < Sinatra::Base
     request.stash[:graph].data_rows.each do |row|
       g = data().get_by_id(row[:graph_id])
       g.c_type = row[:type]
-      g.c_gmode = row[:gmode]
       g.stack = row[:stack]
       data << g
     end
@@ -468,11 +438,10 @@ class Focuslight::Web < Sinatra::Base
     req_params = validate(params, graph_rendering_request_spec)
 
     data = []
-    req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
+    req_params[:complex].split(':').each_slice(4).each do |type, id, stack|
       g = data().get_by_id(id)
       next unless g
       g.c_type = type
-      g.c_gmode = gmode
       g.stack = !!(stack =~ /^(1|true)$/i)
       data << g
     end
@@ -484,11 +453,10 @@ class Focuslight::Web < Sinatra::Base
     req_params = validate(params, graph_rendering_request_spec)
 
     data = []
-    req_params[:complex].split(':').each_slice(4).each do |type, id, gmode, stack|
+    req_params[:complex].split(':').each_slice(4).each do |type, id, stack|
       g = data().get_by_id(id)
       next unless g
       g.c_type = type
-      g.c_gmode = gmode
       g.stack = !!(stack =~ /^(1|true)$/i)
       data << g
     end
@@ -597,7 +565,6 @@ class Focuslight::Web < Sinatra::Base
 
     spec[:data].each do |data|
       data[:type] ||= 'AREA'
-      data[:gmode] ||= 'gauge'
       data[:stack] = true unless data.has_key?(:stack)
     end
 
@@ -627,7 +594,6 @@ class Focuslight::Web < Sinatra::Base
     if spec.has_key?(:data)
       spec[:data].each do |data|
         data[:type] ||= 'AREA'
-        data[:gmode] ||= 'gauge'
         data[:stack] = true unless data.has_key?(:stack)
       end
     end
