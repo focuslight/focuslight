@@ -1,10 +1,14 @@
 require "focuslight"
+require "focuslight/config"
+require "focuslight/logger"
 require "focuslight/graph"
 require "sequel"
 
-DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: $logger)
+DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger)
 
 class Focuslight::Data
+  include Focuslight::Logger
+
   def initialize
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"

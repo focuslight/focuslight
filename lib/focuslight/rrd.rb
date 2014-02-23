@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 require "focuslight"
+require "focuslight/config"
+require "focuslight/logger"
 require "focuslight/graph"
 
 require "time"
@@ -8,6 +10,8 @@ require "tempfile"
 require "rrd"
 
 class Focuslight::RRD
+  include Focuslight::Logger
+
   def initialize(args={})
     @datadir = Focuslight::Config.get(:datadir)
     # rrdcached

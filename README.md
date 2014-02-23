@@ -70,6 +70,7 @@ DBURL=sqlite://data/gforecast.db
 # DBURL=mysql2://root:@localhost/focuslight
 # RRDCACHED=n
 # MOUNT=/
+LOG_PATH=log/application.log
 LOG_LEVEL=warn
 ```
 

@@ -1,4 +1,5 @@
 require "focuslight"
+require "focuslight/config"
 require "focuslight/data"
 
 module Focuslight::Init
