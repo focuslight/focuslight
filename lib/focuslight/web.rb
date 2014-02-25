@@ -1,5 +1,6 @@
 require "focuslight"
 require "focuslight/config"
+require "focuslight/logger"
 require "focuslight/data"
 require "focuslight/rrd"
 
@@ -13,6 +14,8 @@ require "sinatra/json"
 require "erubis"
 
 class Focuslight::Web < Sinatra::Base
+  include Focuslight::Logger
+
   set :dump_errors, true
   set :public_folder, File.join(__dir__, '..', '..', 'public')
   set :views,         File.join(__dir__, '..', '..', 'view')

@@ -17,3 +17,5 @@ test/version_tmp
 tmp
 data/
 .ruby-version
+log/
+*.log

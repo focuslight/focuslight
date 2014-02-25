@@ -1,10 +1,13 @@
 require "focuslight"
+require "focuslight/logger"
 
 require "digest"
 require "json"
 
 module Focuslight
   class Graph
+    include Focuslight::Logger
+
     def self.concrete(row)
       if row.has_key?(:mode) && row.has_key?(:type)
         Focuslight::SimpleGraph.new(row)
