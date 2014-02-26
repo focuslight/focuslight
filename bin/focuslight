@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path("../../lib", __FILE__)
+
+require "dotenv"
+Dotenv.load File.expand_path("../../.env", __FILE__)
+ENV['DATADIR'] = File.expand_path("../../data", __FILE__)
+ENV['DBURL'] = "sqlite://#{File.expand_path("../../data/gforecast.db", __FILE__)}"
+
+unless File.exist? File.expand_path("../../data", __FILE__)
+  require "focuslight/init"
+  Focuslight::Init.run
+end
+
+require "foreman/cli"
+procfile = File.expand_path("../../Procfile-gem", __FILE__)
+Foreman::CLI.new.invoke(:start, [], procfile: procfile)
