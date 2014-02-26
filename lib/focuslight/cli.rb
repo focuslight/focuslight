@@ -5,7 +5,7 @@ require "thor"
 require "focuslight"
 
 class Focuslight::CLI < Thor
-  BASE_DIR = File.join(Dir.pwd, "forcuslight")
+  BASE_DIR = File.join(Dir.pwd, "focuslight")
   DATA_DIR = File.join(BASE_DIR, "data")
   DBURL = "sqlite://#{File.join(DATA_DIR, "gforecast.db")}"
   LOG_DIR = File.join(BASE_DIR, "log")
