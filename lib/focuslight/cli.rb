@@ -33,20 +33,20 @@ EOS
   desc "new", "Creating focuslight resource directory"
   def new
     FileUtils.mkdir_p(LOG_DIR)
-    File.open(ENV_FILE, 'w') {|f| f.puts DEFAULT_DOTENV}
+    File.write ENV_FILE, DEFAULT_DOTENV
   end
 
   desc "init", "Creating database schema"
   def init
-    raise "Before execute `focuslight new`" unless File.exist? ENV_FILE
+    raise "Run `focuslight new` first" unless File.exist? ENV_FILE
     Dotenv.load ENV_FILE
     require "focuslight/init"
     Focuslight::Init.run
   end
 
-  desc "start", "Sartup forcuslight server"
+  desc "start", "Sartup focuslight server"
   def start
-    raise "Before execute `focuslight new`" unless File.exist? ENV_FILE
+    raise "Run `focuslight new` first" unless File.exist? ENV_FILE
 
     Dotenv.load ENV_FILE
     require "foreman/cli"

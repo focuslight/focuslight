@@ -32,11 +32,11 @@ Install focuslight with Ruby 2.0 or later. Execute after installation.
 Four easy steps installation with gem.
 
 1. `gem install focuslight`
-2. `focuslight new`  # creating focuslight resource in `pwd`/forcuslight
-3. `focuslight init` # creating database scheme
+2. `focuslight new`  # creates focuslight resource in `pwd`/forcuslight
+3. `focuslight init` # creates database scheme
 4. `focuslight start`
 
-See `http://localhost:5125/`
+Then see `http://localhost:5125/`
 
 ### Using SQLite:
 
@@ -46,7 +46,7 @@ See `http://localhost:5125/`
 1. initialize database: `bundle exec rake init`
 1. execute: `bundle exec foreman start`
 
-See `http://localhost:5125/`
+Then see `http://localhost:5125/`
 
 ### Using MySQL:
 
