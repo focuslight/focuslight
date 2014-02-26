@@ -28,19 +28,23 @@ LOG_PATH=#{LOG_FILE}
 LOG_LEVEL=warn
 EOS
 
-  desc "init", "Creating database and settings on current directory"
-  def init
+  desc "new", "Creating focuslight resource directory"
+  def new
     FileUtils.mkdir_p(LOG_DIR)
     File.open(ENV_FILE, 'w') {|f| f.puts DEFAULT_DOTENV}
+  end
+
+  desc "init", "Creating database schema"
+  def init
+    raise "Before execute `focuslight new`" unless File.exist? ENV_FILE
     Dotenv.load ENV_FILE
     require "focuslight/init"
     Focuslight::Init.run
-    exit 0
   end
 
   desc "start", "Sartup forcuslight server"
   def start
-    raise "Before execute `focuslight init`" unless File.exist? ENV_FILE
+    raise "Before execute `focuslight new`" unless File.exist? ENV_FILE
 
     Dotenv.load ENV_FILE
     require "foreman/cli"
