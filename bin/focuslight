@@ -2,12 +2,21 @@
 
 $:.unshift File.expand_path("../../lib", __FILE__)
 
+require "fileutils"
 require "dotenv"
 Dotenv.load File.expand_path("../../.env", __FILE__)
-ENV['DATADIR'] = File.expand_path("../../data", __FILE__)
-ENV['DBURL'] = "sqlite://#{File.expand_path("../../data/gforecast.db", __FILE__)}"
 
-unless File.exist? File.expand_path("../../data", __FILE__)
+data_dir = File.join(ENV['HOME'], ".forcuslight/data")
+dburl = "sqlite://#{File.join(data_dir, "gforecast.db")}"
+log_dir = File.join(ENV['HOME'], ".forcuslight/log")
+log_file = File.join(log_dir, "application.log") 
+
+ENV['DATADIR'] = data_dir
+ENV['DBURL'] = dburl
+ENV['LOG_PATH'] = log_file
+
+unless File.exist? data_dir
+  FileUtils.mkdir_p(log_dir)
   require "focuslight/init"
   Focuslight::Init.run
 end
