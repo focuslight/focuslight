@@ -30,13 +30,13 @@ EOS
 
   default_command :start
 
-  desc "new", "Creating focuslight resource directory"
+  desc "new", "Creates focuslight resource directory"
   def new
     FileUtils.mkdir_p(LOG_DIR)
     File.write ENV_FILE, DEFAULT_DOTENV
   end
 
-  desc "init", "Creating database schema"
+  desc "init", "Creates database schema"
   def init
     abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
 
