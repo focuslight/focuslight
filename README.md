@@ -27,6 +27,16 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 
 Install focuslight with Ruby 2.0 or later. Execute after installation.
 
+### Using gem package
+
+Three easy steps installation with gem.
+
+1. `gem install focuslight`
+2. `focuslight init` # creating database and settings on $HOME/.forcuslight
+3. `focuslight`
+
+See `http://localhost:5125/`
+
 ### Using SQLite:
 
 1. clone this repository
