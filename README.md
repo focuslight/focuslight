@@ -29,11 +29,12 @@ Install focuslight with Ruby 2.0 or later. Execute after installation.
 
 ### Using gem package
 
-Three easy steps installation with gem.
+Four easy steps installation with gem.
 
 1. `gem install focuslight`
-2. `focuslight init` # creating database and settings in `pwd`/forcuslight
-3. `focuslight start`
+2. `focuslight new`  # creating focuslight resource in `pwd`/forcuslight
+3. `focuslight init` # creating database scheme
+4. `focuslight start`
 
 See `http://localhost:5125/`
 
