@@ -330,7 +330,7 @@ class Focuslight::RRD
 
       rrdoptions.push(
         'DEF:%s%dt=%s:%s:%s' % [gdata, i, file, gdata, cf],
-        'CDEF:%s%d=%s%dt,%s,%s,LIMIT,%d,%s' % [gdata, i, gdata, i, llimit, ulimit, data.dadjustval, data.adjust],
+        'CDEF:%s%d=%s%dt,%s,%s,LIMIT,%d,%s' % [gdata, i, gdata, i, llimit, ulimit, data.adjustval, data.adjust],
         'XPORT:%s%d:%s' % [gdata, i, _escape(data.graph)]
       )
       defs << ('%s%d' % [gdata, i])
