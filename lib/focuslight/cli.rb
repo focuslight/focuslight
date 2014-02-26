@@ -28,6 +28,8 @@ LOG_PATH=#{LOG_FILE}
 LOG_LEVEL=warn
 EOS
 
+  default_command :start
+
   desc "new", "Creating focuslight resource directory"
   def new
     FileUtils.mkdir_p(LOG_DIR)
