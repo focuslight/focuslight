@@ -4,23 +4,45 @@ $:.unshift File.expand_path("../../lib", __FILE__)
 
 require "fileutils"
 require "dotenv"
-Dotenv.load File.expand_path("../../.env", __FILE__)
 
-data_dir = File.join(ENV['HOME'], ".forcuslight/data")
+HOME = ENV['HOME']
+data_dir = File.join(HOME, ".focuslight/data")
 dburl = "sqlite://#{File.join(data_dir, "gforecast.db")}"
-log_dir = File.join(ENV['HOME'], ".forcuslight/log")
-log_file = File.join(log_dir, "application.log") 
+log_dir = File.join(HOME, ".focuslight/log")
+log_file = File.join(log_dir, "application.log")
+env_file = File.join(HOME, ".focuslight/.env")
 
-ENV['DATADIR'] = data_dir
-ENV['DBURL'] = dburl
-ENV['LOG_PATH'] = log_file
-
-unless File.exist? data_dir
+command = ARGV.shift
+if command == "init"
   FileUtils.mkdir_p(log_dir)
+  DEFAULT_DOTENV =<<-EOS
+DATADIR=#{data_dir}
+PORT=5125
+HOST=0.0.0.0
+# FRONT_PROXY
+# ALLOW_FROM
+# 1MIN_METRICS=n
+FLOAT_SUPPORT=n # y
+DBURL=#{dburl}
+# DBURL=mysql2://root:@localhost/focuslight
+# RRDCACHED=n
+# MOUNT=/
+LOG_PATH=#{log_file}
+LOG_LEVEL=warn
+EOS
+
+  File.open(env_file, 'w') {|f| f.puts DEFAULT_DOTENV}
+  Dotenv.load env_file
   require "focuslight/init"
   Focuslight::Init.run
+  exit 0
 end
 
+unless File.exist? env_file
+  raise "Before execute `focuslight init`"
+end
+
+Dotenv.load env_file
 require "foreman/cli"
 procfile = File.expand_path("../../Procfile-gem", __FILE__)
 Foreman::CLI.new.invoke(:start, [], procfile: procfile)
