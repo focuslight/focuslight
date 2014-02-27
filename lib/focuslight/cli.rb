@@ -64,11 +64,4 @@ EOS
     require "focuslight/worker"
     Focuslight::Worker.run(interval: 60, target: :short)
   end
-
-  no_tasks do
-    def abort(msg)
-      $stderr.puts msg
-      exit 1
-    end
-  end
 end
