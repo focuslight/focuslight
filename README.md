@@ -98,7 +98,6 @@ LOG_LEVEL=warn
 * Front proxies and source address restrictions
 * HTTP API mount point support
 * Daemonize support
-* Installation from rubygems.org
 * Add tests, and tests, and more tests
 
 ## Imcompatible Features
