@@ -22,8 +22,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-nav"
+  spec.add_development_dependency "rake"
 
-  spec.add_runtime_dependency "rake" #TODO: daemon execution without rake
   spec.add_runtime_dependency "dotenv"
   spec.add_runtime_dependency "foreman"
   spec.add_runtime_dependency "thor"
