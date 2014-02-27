@@ -44,7 +44,7 @@ Then see `http://localhost:5125/`
 1. clone this repository
 1. `cd focuslight`
 1. install dependencies: `bundle install`
-1. initialize database: `bundle exec rake init`
+1. initialize database: `bundle exec focuslight init`
 1. execute: `bundle exec foreman start`
 
 Then see `http://localhost:5125/`
