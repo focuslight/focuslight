@@ -48,7 +48,7 @@ EOS
     Dotenv.load
     require "foreman/cli"
     procfile = File.expand_path("../../../Procfile-gem", __FILE__)
-    Foreman::CLI.new.invoke(:start, [], procfile: procfile)
+    Foreman::CLI.new.invoke(:start, [], {root: Dir.pwd, procfile: procfile})
   end
 
   desc "longer", "Startup focuslight longer worker"
