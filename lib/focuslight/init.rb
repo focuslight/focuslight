@@ -1,3 +1,4 @@
+require "fileutils"
 require "focuslight"
 require "focuslight/config"
 require "focuslight/data"
