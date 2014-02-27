@@ -10,6 +10,8 @@ describe Focuslight::CLI do
       expect(Dir.exists?(Focuslight::CLI::BASE_DIR)).to be_true
       expect(Dir.exists?(Focuslight::CLI::LOG_DIR)).to be_true
       expect(File.read(Focuslight::CLI::ENV_FILE)).to eql(Focuslight::CLI::DEFAULT_DOTENV)
+      expect(File.read(Focuslight::CLI::PROCFILE)).to eql(Focuslight::CLI::DEFAULT_PROCFILE)
+      expect(File.read(Focuslight::CLI::CONFIGRU_FILE)).to eql(Focuslight::CLI::DEFAULT_CONFIGRU)
     }
     after { FileUtils.remove_dir(Focuslight::CLI::BASE_DIR) }
   end

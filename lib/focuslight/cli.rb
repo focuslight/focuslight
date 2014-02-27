@@ -11,6 +11,8 @@ class Focuslight::CLI < Thor
   LOG_DIR = File.join(BASE_DIR, "log")
   LOG_FILE = File.join(LOG_DIR, "application.log")
   ENV_FILE = File.join(BASE_DIR, ".env")
+  PROCFILE = File.join(BASE_DIR, "Procfile")
+  CONFIGRU_FILE = File.join(BASE_DIR, "config.ru")
 
   DEFAULT_DOTENV =<<-EOS
 DATADIR=#{DATA_DIR}
@@ -28,12 +30,29 @@ LOG_PATH=#{LOG_FILE}
 LOG_LEVEL=warn
 EOS
 
+  DEFAULT_PROCFILE =<<-EOS
+web: unicorn -E production -p $PORT -o $HOST
+worker1: focuslight longer
+worker2: focuslight shorter
+EOS
+
+  DEFAULT_CONFIGRU =<<-EOS
+require "rubygems"
+require "sinatra"
+require "focuslight"
+require "focuslight/web"
+
+run Focuslight::Web
+EOS
+
   default_command :start
 
   desc "new", "Creates focuslight resource directory"
   def new
     FileUtils.mkdir_p(LOG_DIR)
     File.write ENV_FILE, DEFAULT_DOTENV
+    File.write PROCFILE, DEFAULT_PROCFILE
+    File.write CONFIGRU_FILE, DEFAULT_CONFIGRU
   end
 
   desc "init", "Creates database schema"
@@ -47,8 +66,7 @@ EOS
   def start
     Dotenv.load
     require "foreman/cli"
-    procfile = File.expand_path("../../../Procfile-gem", __FILE__)
-    Foreman::CLI.new.invoke(:start, [], procfile: procfile)
+    Foreman::CLI.new.invoke(:start, [], {})
   end
 
   desc "longer", "Startup focuslight longer worker"
