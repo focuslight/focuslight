@@ -1,3 +1,9 @@
+# 0.1.2 (2014/02/27)
+
+Fixes:
+
+* Fix `focuslight start` in a gem
+
 # 0.1.1 (2014/02/27)
 
 Enhancements:
