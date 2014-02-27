@@ -33,8 +33,9 @@ Four easy steps installation with gem.
 
 1. `gem install focuslight`
 2. `focuslight new`  # creates focuslight resource in `pwd`/focuslight
-3. `focuslight init` # creates database scheme
-4. `focuslight start`
+3. `cd focuslight`
+4. `focuslight init` # creates database scheme
+5. `focuslight start`
 
 Then see `http://localhost:5125/`
 
