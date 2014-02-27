@@ -38,19 +38,50 @@ EOS
 
   desc "init", "Creating database schema"
   def init
-    raise "Run `focuslight new` first" unless File.exist? ENV_FILE
+    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
+
     Dotenv.load ENV_FILE
     require "focuslight/init"
     Focuslight::Init.run
   end
 
-  desc "start", "Sartup focuslight server"
+  desc "start", "Sartup focuslight"
   def start
-    raise "Run `focuslight new` first" unless File.exist? ENV_FILE
+    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
 
     Dotenv.load ENV_FILE
     require "foreman/cli"
     procfile = File.expand_path("../../../Procfile-gem", __FILE__)
     Foreman::CLI.new.invoke(:start, [], procfile: procfile)
+  end
+
+  desc "longer", "Startup focuslight longer worker"
+  def longer
+    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
+
+    Dotenv.load ENV_FILE
+    require "focuslight/worker"
+    Focuslight::Worker.run(interval: 300, target: :normal)
+  end
+
+  desc "shorter", "Startup focuslight shorter worker"
+  def shorter
+    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
+
+    Dotenv.load ENV_FILE
+    require "focuslight/worker"
+    Focuslight::Worker.run(interval: 60, target: :short)
+  end
+
+  #desc "web", "Startup focuslight web server"
+  #def web
+  # ToDo
+  #end
+
+  no_tasks do
+    def abort(msg)
+      $stderr.puts msg
+      exit 1
+    end
   end
 end
