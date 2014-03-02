@@ -36,15 +36,6 @@ worker1: focuslight longer
 worker2: focuslight shorter
 EOS
 
-  DEFAULT_CONFIGRU =<<-EOS
-require "rubygems"
-require "sinatra"
-require "focuslight"
-require "focuslight/web"
-
-run Focuslight::Web
-EOS
-
   default_command :start
 
   desc "new", "Creates focuslight resource directory"
@@ -52,7 +43,8 @@ EOS
     FileUtils.mkdir_p(LOG_DIR)
     File.write ENV_FILE, DEFAULT_DOTENV
     File.write PROCFILE, DEFAULT_PROCFILE
-    File.write CONFIGRU_FILE, DEFAULT_CONFIGRU
+    configru_file = File.expand_path("../../../config.ru", __FILE__)
+    FileUtils.copy(configru_file, CONFIGRU_FILE)
   end
 
   desc "init", "Creates database schema"
