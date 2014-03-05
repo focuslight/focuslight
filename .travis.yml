@@ -6,4 +6,4 @@ gemfile:
 before_install:
   - sudo apt-get install rrdtool librrd-dev
 before_script:
-  - bundle exec rake init
+  - bundle exec focuslight init

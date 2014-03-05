@@ -1,3 +1,0 @@
-web: unicorn -E production -p $PORT -o $HOST
-worker1: focuslight longer
-worker2: focuslight shorter

@@ -1,6 +1,6 @@
 require "rubygems"
 require "sinatra"
-
-require File.expand_path '../lib/focuslight/web.rb', __FILE__
+require "focuslight"
+require "focuslight/web"
 
 run Focuslight::Web

@@ -11,6 +11,8 @@ class Focuslight::CLI < Thor
   LOG_DIR = File.join(BASE_DIR, "log")
   LOG_FILE = File.join(LOG_DIR, "application.log")
   ENV_FILE = File.join(BASE_DIR, ".env")
+  PROCFILE = File.join(BASE_DIR, "Procfile")
+  CONFIGRU_FILE = File.join(BASE_DIR, "config.ru")
 
   DEFAULT_DOTENV =<<-EOS
 DATADIR=#{DATA_DIR}
@@ -28,60 +30,48 @@ LOG_PATH=#{LOG_FILE}
 LOG_LEVEL=warn
 EOS
 
+  DEFAULT_PROCFILE =<<-EOS
+web: unicorn -E production -p $PORT -o $HOST
+worker1: focuslight longer
+worker2: focuslight shorter
+EOS
+
   default_command :start
 
   desc "new", "Creates focuslight resource directory"
   def new
     FileUtils.mkdir_p(LOG_DIR)
     File.write ENV_FILE, DEFAULT_DOTENV
+    File.write PROCFILE, DEFAULT_PROCFILE
+    configru_file = File.expand_path("../../../config.ru", __FILE__)
+    FileUtils.copy(configru_file, CONFIGRU_FILE)
   end
 
   desc "init", "Creates database schema"
   def init
-    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
-
-    Dotenv.load ENV_FILE
+    Dotenv.load
     require "focuslight/init"
     Focuslight::Init.run
   end
 
   desc "start", "Sartup focuslight"
   def start
-    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
-
-    Dotenv.load ENV_FILE
+    Dotenv.load
     require "foreman/cli"
-    procfile = File.expand_path("../../../Procfile-gem", __FILE__)
-    Foreman::CLI.new.invoke(:start, [], procfile: procfile)
+    Foreman::CLI.new.invoke(:start, [], {})
   end
 
   desc "longer", "Startup focuslight longer worker"
   def longer
-    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
-
-    Dotenv.load ENV_FILE
+    Dotenv.load
     require "focuslight/worker"
     Focuslight::Worker.run(interval: 300, target: :normal)
   end
 
   desc "shorter", "Startup focuslight shorter worker"
   def shorter
-    abort "\"#{ENV_FILE}\" is not found. Run `focuslight new` first" unless File.exist? ENV_FILE
-
-    Dotenv.load ENV_FILE
+    Dotenv.load
     require "focuslight/worker"
     Focuslight::Worker.run(interval: 60, target: :short)
-  end
-
-  #desc "web", "Startup focuslight web server"
-  #def web
-  # ToDo
-  #end
-
-  no_tasks do
-    def abort(msg)
-      $stderr.puts msg
-      exit 1
-    end
   end
 end
