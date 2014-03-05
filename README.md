@@ -25,34 +25,40 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 
 ## Installation
 
-Install focuslight with Ruby 2.0 or later. Execute after installation.
+Install focuslight with Ruby 2.0 or later. 
 
-### Using gem package
+### Gem package
 
-Four easy steps installation with gem.
+Five easy steps on installation with gem and SQLite.
 
-1. `gem install focuslight`
-2. `focuslight new`  # creates focuslight resource in `pwd`/focuslight
-3. `cd focuslight`
-4. `focuslight init` # creates database scheme
-5. `focuslight start`
+```bash
+$ gem install focuslight
+$ focuslight new
+$ cd focuslight
+$ focuslight init # creates database scheme on SQLite
+$ focuslight start
+```
 
-Then see `http://localhost:5125/`
+Then see `http://localhost:5125/`. Refer `Using MySQL` section to use MySQL instead of SQLite. 
 
-### Using SQLite:
+### Git repository
 
-1. clone this repository
-1. `cd focuslight`
-1. install dependencies: `bundle install`
-1. initialize database: `bundle exec focuslight init`
-1. execute: `bundle exec foreman start`
+Install from git repository. 
 
-Then see `http://localhost:5125/`
+```bash
+$ git clone https://github.com/focuslight/focuslight.git
+$ cd focuslight
+$ bundle
+$ bundle exec focuslight init # creates database scheme on SQLite
+$ bundle exec focuslight start
+```
 
-### Using MySQL:
+Then see `http://localhost:5125/`. Refer `Using MySQL` section to use MySQL instead of SQLite. 
 
-You need to change DBURL parameter on .env file to `mysql2` version. 
-You may also configure the database name, the user name, and the password. See the Configuration section. 
+### Using MySQL
+
+Change `DBURL` parameter on .env file to `mysql2` version like `DBURL=mysql2://root:@localhost/focuslight`. 
+Also configure the database name, the user name, and the password. See the Configuration section. 
 
 Then, create the database and assign permissions to the user as
 
@@ -62,7 +68,7 @@ mysql> GRANT  CREATE, ALTER, DELETE, INSERT, UPDATE, SELECT \\
   ON focuslight.* TO 'user'\@'localhost' IDENTIFIED BY password;
 ```
 
-Then, do the same thing with SQLite case. 
+After that, follow the same procedure with the SQLite case.
 
 ## Configuration
 
@@ -101,9 +107,9 @@ LOG_LEVEL=warn
 * Daemonize support
 * Add tests, and tests, and more tests
 
-## Imcompatible Features
+## Incompatible Features
 
-Focuslight has following incompatibilitie with GrowthForecast as specifications.
+Focuslight has following incompatibilities with GrowthForecast as specifications.
 
 ### Subtract
 
