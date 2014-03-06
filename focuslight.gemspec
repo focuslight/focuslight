@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "sinatra-contrib"
   spec.add_runtime_dependency "erubis"
   spec.add_runtime_dependency "unicorn"
+  spec.add_runtime_dependency "unicorn-worker-killer"
 
   spec.add_runtime_dependency "sequel"
   spec.add_runtime_dependency "sqlite3"
