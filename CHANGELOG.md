@@ -1,4 +1,8 @@
-# 0.1.2 (2014/02/27)
+# 0.1.3 (2014/03/24)
+
+Enhancements:
+
+* Use unicorn-worker-killer
 
 Fixes:
 
