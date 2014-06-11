@@ -13,20 +13,20 @@ describe Focuslight::Validator::Rule do
   describe '#check' do
     it 'can validate value with first argument lambda' do
       r1 = Focuslight::Validator::Rule.new(->(v){ v.nil? }, "only nil")
-      expect(r1.check(nil)).to be_true
-      expect(r1.check("str")).to be_false
+      expect(r1.check(nil)).to be_truthy
+      expect(r1.check("str")).to be_falsey
 
       r2 = Focuslight::Validator::Rule.new(->(v){ v.to_i == 1 }, "one")
-      expect(r2.check("0")).to be_false
-      expect(r2.check("1.00")).to be_true
-      expect(r2.check("1")).to be_true
-      expect(r2.check("2")).to be_false
+      expect(r2.check("0")).to be_falsey
+      expect(r2.check("1.00")).to be_truthy
+      expect(r2.check("1")).to be_truthy
+      expect(r2.check("2")).to be_falsey
     end
 
     it 'can receive 2 or more values for lambda arguments if specified' do
       r1 = Focuslight::Validator::Rule.new(->(v1,v2,v3){ v1.to_i > v2.to_i && v2.to_i > v3.to_i }, "order by desc")
-      expect(r1.check("1","2","3")).to be_false
-      expect(r1.check("3","2","1")).to be_true
+      expect(r1.check("1","2","3")).to be_falsey
+      expect(r1.check("3","2","1")).to be_truthy
       expect{ r1.check("3") }.to raise_error(ArgumentError)
 
       r2 = Focuslight::Validator::Rule.new(->(v1){ v1.to_i > 0 }, "greater than zero")
