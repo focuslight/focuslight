@@ -5,12 +5,12 @@ require 'focuslight/validator'
 describe Focuslight::Validator::Result do
   it 'indicate that it has errors or not' do
     r = Focuslight::Validator::Result.new
-    expect(r.has_error?).to be_false
+    expect(r.has_error?).to be_falsey
     r.error(:key, "error 1")
-    expect(r.has_error?).to be_true
+    expect(r.has_error?).to be_truthy
     expect(r.errors).to eql({key: "key: error 1"})
     r.error(:key2, "error 2")
-    expect(r.has_error?).to be_true
+    expect(r.has_error?).to be_truthy
     expect(r.errors).to eql({key:"key: error 1", key2:"key2: error 2"})
   end
 
