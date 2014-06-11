@@ -361,10 +361,9 @@ class Focuslight::RRD
     start_timestamp = ret.first.first
     end_timestamp = ret.last.first
     step = ret[1].first - ret[0].first
-
     rows = []
     ret.each do |values|
-      rows << values[1..-1]
+      rows << values[1..-1].map {|v| v.nan? ? nil : v}
     end
 
     {
