@@ -1,3 +1,9 @@
+# 0.1.4 (2014/06/11)
+
+Enhancements:
+
+* Add link label to JSON xport
+
 # 0.1.3 (2014/03/24)
 
 Enhancements:
