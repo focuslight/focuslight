@@ -330,7 +330,7 @@ class Focuslight::RRD
 
       rrdoptions.push(
         'DEF:%s%dt=%s:%s:%s' % [gdata, i, file, gdata, cf],
-        'CDEF:%s%d=%s%dt,%s,%s,LIMIT,%d,%s' % [gdata, i, gdata, i, llimit, ulimit, data.dadjustval, data.adjust],
+        'CDEF:%s%d=%s%dt,%s,%s,LIMIT,%d,%s' % [gdata, i, gdata, i, llimit, ulimit, data.adjustval, data.adjust],
         'XPORT:%s%d:%s' % [gdata, i, _escape(data.graph)]
       )
       defs << ('%s%d' % [gdata, i])
@@ -361,10 +361,10 @@ class Focuslight::RRD
     start_timestamp = ret.first.first
     end_timestamp = ret.last.first
     step = ret[1].first - ret[0].first
-
     rows = []
     ret.each do |values|
-      rows << values[1..-1]
+      # GrowthForecast compatibility NaN to nil
+      rows << values[1..-1].map {|v| v.nan? ? nil : v}
     end
 
     {

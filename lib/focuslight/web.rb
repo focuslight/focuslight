@@ -436,7 +436,7 @@ class Focuslight::Web < Sinatra::Base
 
   get '/xport/:service_name/:section_name/:graph_name', :graph => :simple do
     req_params = validate(params, graph_rendering_request_spec)
-    json(rrd().export(request.stash[:graph], req_params.hash))
+    MultiJson.dump(rrd().export(request.stash[:graph], req_params.hash))
   end
 
   get '/graph/:complex' do
@@ -466,7 +466,7 @@ class Focuslight::Web < Sinatra::Base
       data << g
     end
 
-    json(rrd().export(data, req_params.hash))
+    MultiJson.dump(rrd().export(data, req_params.hash))
   end
 
   get '/api/:service_name/:section_name/:graph_name', :graph => :simple do

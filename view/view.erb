@@ -15,8 +15,10 @@
   <% if graph.complex? %>
     <a class="label label-success" style="cursor: pointer" href="<%= url_for "/edit_complex/#{graph.id}" %>"><span class="glyphicon glyphicon-wrench"></span> Setting</a>
     <span class="label label-warning">Complex Graph</span>
+    <a class="label label-info" style="cursor: pointer" href="<%= url_for("/xport/#{graph.complex_graph}", t: current_term, sumup: graph.sumup) %>"><span class="glyphicon glyphicon-share"></span> JSON</a>
   <% else %>
     <a class="label label-success" style="cursor: pointer" href="<%= url_for linkpath(graph.path, '/edit') %>"><span class="glyphicon glyphicon-wrench"></span> Setting</a>
+    <a class="label label-info" style="cursor: pointer" href="<%= url_for("/xport/#{graph.service}/#{graph.section}/#{graph.graph}") %>"><span class="glyphicon glyphicon-share"></span> JSON</a>
     <span class="label label-default">current</span> <%= format_number graph.number %>
     <span class="label label-default">mode</span> <%= graph.mode %>
   <% end %>
