@@ -363,6 +363,7 @@ class Focuslight::RRD
     step = ret[1].first - ret[0].first
     rows = []
     ret.each do |values|
+      # GrowthForecast compatibility NaN to nil
       rows << values[1..-1].map {|v| v.nan? ? nil : v}
     end
 
