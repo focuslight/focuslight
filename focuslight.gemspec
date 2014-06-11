@@ -6,8 +6,8 @@ require 'focuslight/version'
 Gem::Specification.new do |spec|
   spec.name          = "focuslight"
   spec.version       = Focuslight::VERSION
-  spec.authors       = ["TAGOMORI Satoshi", "Naotoshi Seo", "Shota Fukumori (sora_h)"]
-  spec.email         = ["tagomoris@gmail.com", "sonots@gmail.com", "her@sorah.jp"]
+  spec.authors       = ["TAGOMORI Satoshi", "Naotoshi Seo", "Shota Fukumori (sora_h)", "Koichiro Ohba"]
+  spec.email         = ["tagomoris@gmail.com", "sonots@gmail.com", "her@sorah.jp", "koichiro@meadowy.org"]
   spec.description   = %q{Lightning Fast Graphing/Visualization, built on RRDTool}
   spec.summary       = %q{Lightning Fast Graphing/Visualization, built on RRDTool}
   spec.homepage      = "https://github.com/tagomoris/focuslight"
