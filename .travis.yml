@@ -1,9 +1,15 @@
+language: ruby
 rvm:
-  - 2.0.0
+  - 2.0
   - 2.1
+  - 2.2
 gemfile:
   - Gemfile
+bundler_args: --deployment
+cache: bundler
 before_install:
   - sudo apt-get install rrdtool librrd-dev
+  - gem update --system
+  - gem install bundler
 before_script:
   - bundle exec focuslight init
