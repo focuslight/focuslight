@@ -8,7 +8,7 @@ class Focuslight::Data
   include Focuslight::Logger
 
   def initialize
-    @db = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout))
+    @db = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout).to_i)
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
 
