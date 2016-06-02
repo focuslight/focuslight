@@ -391,8 +391,6 @@ class Focuslight::Web < Sinatra::Base
     notitle: { default: 'false', rule: rule(:bool) },
     xgrid: { default: '' },
     ygrid: { default: '' },
-    upper_limit: { default: 2 },
-    lower_limit: { default: 0 },
     rigid: { default: 'false', rule: rule(:bool) },
     sumup: { default: 'false', rule: rule(:bool) },
     step: { excludable: true, rule: rule(:uint) },

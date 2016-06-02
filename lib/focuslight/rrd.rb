@@ -266,8 +266,6 @@ class Focuslight::RRD
       "-w", 390,
       "-h", 110,
       "-a", "PNG",
-      "-l", 0,
-      "-u", 2,
       "-x", "HOUR:1:HOUR:2:HOUR:2:0:%H",
       "-s", -118800,
       "-e", "now",
