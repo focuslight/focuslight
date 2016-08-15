@@ -3,7 +3,7 @@
   <li class="prev <%= params[:t] == 'sh' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'sh' %>">hour・8hours(1min)</a></li>
   <li class="prev <%= params[:t] == 'sd' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'sd' %>">day・3days(1min)</a></li>
   <li class="prev <%= params[:t] == 'h' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'h' %>">hour・halfday</a></li>
-  <li class="<%= ['h','m','sh','sd'].include?(params[:t]) ? '' : 'activate' %>"><a href="<%= url_for link_path %>">day・week</a></li>
+  <li class="<%= ['h','m','sh','sd'].include?(params[:t]) ? '' : 'active' %>"><a href="<%= url_for link_path %>">day・week</a></li>
   <li class="next <%= params[:t] == 'm' ? 'active' : '' %>"><a href="<%= url_for link_path, t:'m' %>">month・year</a></li>
 </ul>
 <div class="clearfix"></div>
