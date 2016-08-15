@@ -366,7 +366,7 @@ class Focuslight::Web < Sinatra::Base
     section_name: not_specified_or_not_whitespece,
     graph_name: not_specified_or_not_whitespece,
     complex: not_specified_or_not_whitespece,
-    t: { default: 'd', rule: rule(:choice, 'd', 'h', 'm', 'sh', 'sd') },
+    t: { default: 'd', rule: rule(:choice, %w(y m w 3d s3d d sd 8h s8h 4h s4h h sh n sn c sc)) },
     from: {
       default: (Time.now - 86400*8).strftime('%Y/%m/%d %T'),
       rule: rule(:lambda, ->(v){ Time.parse(v) rescue false }, "invalid time format"),
