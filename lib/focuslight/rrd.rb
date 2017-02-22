@@ -204,11 +204,12 @@ class Focuslight::RRD
       stack = (data.stack && i > 0 ? ':STACK' : '')
       file = (span =~ /^s/ ? path(data, :short) : path(data, :long))
       unit = (data.unit || '').gsub('%', '%%')
+      color = "#777777" || data.color
 
       rrdoptions.push(
         'DEF:%s%dt=%s:%s:AVERAGE' % [gdata, i, file, gdata],
         'CDEF:%s%d=%s%dt,%s,%s,LIMIT,%d,%s' % [gdata, i, gdata, i, llimit, ulimit, data.adjustval, data.adjust],
-        '%s:%s%d%s:%s %s' % [type, gdata, i, data.color, _escape(data.graph), stack],
+        '%s:%s%d%s:%s %s' % [type, gdata, i, color, _escape(data.graph), stack],
         'GPRINT:%s%d:LAST:Cur\: %%4.1lf%%s%s' % [gdata, i, unit],
         'GPRINT:%s%d:AVERAGE:Avg\: %%4.1lf%%s%s' % [gdata, i, unit],
         'GPRINT:%s%d:MAX:Max\: %%4.1lf%%s%s' % [gdata, i, unit],
