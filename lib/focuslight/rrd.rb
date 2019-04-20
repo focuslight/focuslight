@@ -191,8 +191,8 @@ class Focuslight::RRD
     rrdoptions.push('--font', "AXIS:8:")
     rrdoptions.push('--font', "LEGEND:8:")
 
-    rrdoptions.push('-u', args[:upper_limit]) if args[:upper_limit]
-    rrdoptions.push('-l', args[:lower_limit]) if args[:lower_limit]
+    rrdoptions.push('-u', args[:upper_limit]) unless args[:upper_limit].empty?
+    rrdoptions.push('-l', args[:lower_limit]) unless args[:lower_limit].empty?
     rrdoptions.push('-r') if args[:rigid]
 
     defs = []
