@@ -12,6 +12,8 @@ module Focuslight::Config
       ENV.fetch('FLOAT_SUPPORT', false)
     when :dburl
       ENV.fetch('DBURL', 'sqlite://data/gforecast.db')
+    when :dbtimeout
+      ENV.fetch('DBURL', '60000').to_i
     when :log_path
       ENV.fetch('LOG_PATH', DEFAULT_LOG_PATH)
     when :log_level

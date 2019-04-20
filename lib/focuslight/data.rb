@@ -4,7 +4,7 @@ require "focuslight/logger"
 require "focuslight/graph"
 require "sequel"
 
-DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger)
+DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout))
 
 class Focuslight::Data
   include Focuslight::Logger
