@@ -22,7 +22,7 @@ class Focuslight::Data
   end
 
   def number_type
-    @floatings ? Float : Bignum
+    @floatings ? Float : Integer
   end
 
   def create_tables
@@ -30,35 +30,35 @@ class Focuslight::Data
     DB.transaction do
 
       DB.create_table :graphs do
-        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
+        primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :mode, String, default: "gauge", null: false
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: 0, null: false
+        column :sort, Integer, default: 0, null: false
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
         column :type, String, default: "AREA", null: false
         String :meta, text: true
-        column :created_at, Bignum, null: false
-        column :updated_at, Bignum, null: false
+        column :created_at, Integer, null: false
+        column :updated_at, Integer, null: false
         unique [:service_name, :section_name, :graph_name]
       end
 
       DB.create_table :complex_graphs do
-        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
+        primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: 0, null: false
+        column :sort, Integer, default: 0, null: false
         String :meta, text: true
-        column :created_at, Bignum, null: false
-        column :updated_at, Bignum, null: false
+        column :created_at, Integer, null: false
+        column :updated_at, Integer, null: false
         unique [:service_name, :section_name, :graph_name]
       end
     end
