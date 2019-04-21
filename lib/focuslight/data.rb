@@ -4,21 +4,20 @@ require "focuslight/logger"
 require "focuslight/graph"
 require "sequel"
 
-DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout))
-
 class Focuslight::Data
   include Focuslight::Logger
 
   def initialize
+    @db = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout))
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
 
-    if DB.database_type == :sqlite
-      DB.run 'PRAGMA journal_mode = WAL'
-      DB.run 'PRAGMA synchronous = NORMAL'
+    if @db.database_type == :sqlite
+      @db.run 'PRAGMA journal_mode = WAL'
+      @db.run 'PRAGMA synchronous = NORMAL'
     end
-    @graphs = DB.from(:graphs)
-    @complex_graphs = DB.from(:complex_graphs)
+    @graphs = @db.from(:graphs)
+    @complex_graphs = @db.from(:complex_graphs)
   end
 
   def number_type
@@ -27,9 +26,9 @@ class Focuslight::Data
 
   def create_tables
     ntype = number_type
-    DB.transaction do
+    @db.transaction do
 
-      DB.create_table :graphs do
+      @db.create_table :graphs do
         primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
@@ -48,7 +47,7 @@ class Focuslight::Data
         unique [:service_name, :section_name, :graph_name]
       end
 
-      DB.create_table :complex_graphs do
+      @db.create_table :complex_graphs do
         primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
@@ -65,12 +64,12 @@ class Focuslight::Data
   end
 
   def execute(*args)
-    DB.run(*args)
+    @db.run(*args)
   end
 
   def transaction
-    DB.transaction do
-      yield DB
+    @db.transaction do
+      yield @db
     end
   end
 
@@ -92,7 +91,7 @@ class Focuslight::Data
 
   def update(service_name, section_name, graph_name, number, mode, color)
     data = nil
-    DB.transaction do
+    @db.transaction do
       data = @graphs.where(service_name: service_name, section_name: section_name, graph_name: graph_name).first
       if data
         graph = Focuslight::Graph.concrete(data)
@@ -186,7 +185,7 @@ class Focuslight::Data
   end
 
   def remove(id)
-    DB.transaction do
+    @db.transaction do
       @graphs.where(id: id).delete
     end
   end
