@@ -11,7 +11,7 @@ require "cgi"
 
 require "sinatra/base"
 require "sinatra/json"
-require "erubis"
+require "erubi"
 
 class Focuslight::Web < Sinatra::Base
   include Focuslight::Logger
