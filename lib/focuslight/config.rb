@@ -15,9 +15,6 @@ module Focuslight::Config
   }
 
   def self.get(name)
-    unless CONFIG.has_key?(name)
-      raise ArgumentError, 'unknown configuration keyword'
-    end
-    CONFIG[name]
+    CONFIG.fetch(name)
   end
 end
