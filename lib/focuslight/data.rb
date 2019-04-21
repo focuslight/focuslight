@@ -26,8 +26,8 @@ class Focuslight::Data
 
   def create_tables
     ntype = number_type
-    @db.transaction do
 
+    @db.transaction do
       @db.create_table :graphs do
         primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
