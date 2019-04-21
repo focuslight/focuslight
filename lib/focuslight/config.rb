@@ -7,6 +7,7 @@ module Focuslight::Config
     datadir: ENV.fetch('DATADIR', DEFAULT_DATADIR),
     float_support: ENV.fetch('FLOAT_SUPPORT', false),
     dburl: ENV.fetch('DBURL', 'sqlite://data/gforecast.db'),
+    dbtimeout: ENV.fetch('DBTIMEOUT', '60000').to_i,
     log_path: ENV.fetch('LOG_PATH', DEFAULT_LOG_PATH),
     log_level: ENV.fetch('LOG_LEVEL', 'info'),
     log_shift_age: ENV.fetch('LOG_SHIFT_AGE', '0'),
