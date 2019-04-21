@@ -8,6 +8,6 @@ cache: bundler
 before_install:
   - sudo apt-get install rrdtool librrd-dev sqlite3 libsqlite3-dev
   - gem update --system
-  - gem install bundler
+  - gem install -v "1.17.3" bundler
 before_script:
   - bundle exec focuslight init
