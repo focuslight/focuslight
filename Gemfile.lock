@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    focuslight (0.2.0)
+    focuslight (0.2.1)
       dotenv
-      erubis
+      erubi
       foreman
       librrd
       mysql2
@@ -31,7 +31,7 @@ GEM
     concurrent-ruby (1.1.5)
     diff-lcs (1.3)
     dotenv (2.7.2)
-    erubis (2.7.0)
+    erubi (1.8.0)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     ffi (1.10.0)
