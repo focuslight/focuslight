@@ -85,6 +85,7 @@ HOST=0.0.0.0
 # 1MIN_METRICS=n
 FLOAT_SUPPORT=n # y
 DBURL=sqlite://data/gforecast.db
+DBTIMEOUT=60000
 # DBURL=mysql2://root:@localhost/focuslight
 # RRDCACHED=n
 # MOUNT=/
@@ -96,6 +97,14 @@ LOG_LEVEL=warn
 
 1. Copy GrowthForecast's `datadir` directory (and its contents) to `./data` (or where you specified)
 1. Execute Focuslight
+
+## Example: Creating a New Graph
+
+Using curl:
+
+```
+$ curl -F number=10 http://localhost:5125/api/socialgame/member/register
+```
 
 ## TODO
 

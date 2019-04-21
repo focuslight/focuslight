@@ -1,3 +1,15 @@
+# 0.2.0 (2019/04/20)
+
+Enhancements:
+
+* Support Ruby version 2.5 higher
+
+Fixes:
+
+* Security fix:
+  * ffi, rack, rack-protection
+* Fix ulimti/llimit check
+
 # 0.1.4 (2014/06/11)
 
 Enhancements:

@@ -1,13 +1,12 @@
 language: ruby
 rvm:
-  - 2.1
-  - 2.2
+  - 2.5
 gemfile:
   - Gemfile
 bundler_args: --deployment
 cache: bundler
 before_install:
-  - sudo apt-get install rrdtool librrd-dev
+  - sudo apt-get install rrdtool librrd-dev sqlite3 libsqlite3-dev
   - gem update --system
   - gem install bundler
 before_script:

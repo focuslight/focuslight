@@ -4,73 +4,72 @@ require "focuslight/logger"
 require "focuslight/graph"
 require "sequel"
 
-DB = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger)
-
 class Focuslight::Data
   include Focuslight::Logger
 
   def initialize
+    @db = Sequel.connect(Focuslight::Config.get(:dburl), logger: Focuslight.logger, timeout: Focuslight::Config.get(:dbtimeout))
     @datadir = Focuslight::Config.get(:datadir)
     @floatings = Focuslight::Config.get(:float_support) == "y"
 
-    if DB.database_type == :sqlite
-      DB.run 'PRAGMA journal_mode = WAL'
-      DB.run 'PRAGMA synchronous = NORMAL'
+    if @db.database_type == :sqlite
+      @db.run 'PRAGMA journal_mode = WAL'
+      @db.run 'PRAGMA synchronous = NORMAL'
     end
-    @graphs = DB.from(:graphs)
-    @complex_graphs = DB.from(:complex_graphs)
+    @graphs = @db.from(:graphs)
+    @complex_graphs = @db.from(:complex_graphs)
   end
 
   def number_type
-    @floatings ? Float : Bignum
+    @floatings ? Float : Integer
   end
 
   def create_tables
     ntype = number_type
-    DB.transaction do
 
-      DB.create_table :graphs do
-        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
+    @db.transaction do
+      @db.create_table :graphs do
+        primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :mode, String, default: "gauge", null: false
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: 0, null: false
+        column :sort, Integer, default: 0, null: false
         column :color, String, default: "#00CC00", null: false
         column :ulimit, ntype, default: 1000000000000000, null: false
         column :llimit, ntype, default: 0, null: false
         column :type, String, default: "AREA", null: false
         String :meta, text: true
-        column :created_at, Bignum, null: false
-        column :updated_at, Bignum, null: false
+        column :created_at, Integer, null: false
+        column :updated_at, Integer, null: false
         unique [:service_name, :section_name, :graph_name]
       end
 
-      DB.create_table :complex_graphs do
-        primary_key :id, Bignum # Notice that SQLite actually creates integer primary key
+      @db.create_table :complex_graphs do
+        primary_key :id, Integer # Notice that SQLite actually creates integer primary key
         column :service_name, String, null: false
         column :section_name, String, null: false
         column :graph_name, String, null: false
         column :number, ntype, default: 0
         column :description, String, default: "", null: false
-        column :sort, Bignum, default: 0, null: false
+        column :sort, Integer, default: 0, null: false
         String :meta, text: true
-        column :created_at, Bignum, null: false
-        column :updated_at, Bignum, null: false
+        column :created_at, Integer, null: false
+        column :updated_at, Integer, null: false
         unique [:service_name, :section_name, :graph_name]
       end
     end
   end
 
   def execute(*args)
-    DB.run(*args)
+    @db.run(*args)
   end
 
   def transaction
-    DB.transaction do
-      yield DB
+    @db.transaction do
+      yield @db
     end
   end
 
@@ -92,7 +91,7 @@ class Focuslight::Data
 
   def update(service_name, section_name, graph_name, number, mode, color)
     data = nil
-    DB.transaction do
+    @db.transaction do
       data = @graphs.where(service_name: service_name, section_name: section_name, graph_name: graph_name).first
       if data
         graph = Focuslight::Graph.concrete(data)
@@ -186,7 +185,7 @@ class Focuslight::Data
   end
 
   def remove(id)
-    DB.transaction do
+    @db.transaction do
       @graphs.where(id: id).delete
     end
   end
