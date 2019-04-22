@@ -387,6 +387,7 @@ class Focuslight::Web < Sinatra::Base
     border: { default: '3', rule: rule(:uint) },
     legend: { default: 'true', rule: rule(:bool) },
     notitle: { default: 'false', rule: rule(:bool) },
+    vertical_label: { default: '' },
     xgrid: { default: '' },
     ygrid: { default: '' },
     upper_limit: { default: '' },

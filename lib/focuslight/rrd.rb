@@ -184,6 +184,7 @@ class Focuslight::RRD
     ]
     rrdoptions.push('-y', args[:ygrid]) unless args[:ygrid].empty?
     rrdoptions.push('-t', period_title.to_s.dup) unless args[:notitle]
+    rrdoptions.push('-v', args[:vertical_label]) unless args[:vertical_label].empty?
     rrdoptions.push('--no-legend') unless args[:legend]
     rrdoptions.push('--only-graph') if args[:graphonly]
     rrdoptions.push('--logarithmic') if args[:logarithmic]
