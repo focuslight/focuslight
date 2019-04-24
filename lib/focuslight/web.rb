@@ -90,8 +90,6 @@ class Focuslight::Web < Sinatra::Base
         Focuslight::Validator.rule(:real)
       elsif type == Integer
         Focuslight::Validator.rule(:int)
-      elsif type == Bignum
-        Focuslight::Validator.rule(:int)
       else
         raise "unknown number_type #{data().number_type}"
       end
