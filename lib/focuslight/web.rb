@@ -392,7 +392,7 @@ class Focuslight::Web < Sinatra::Base
     upper_limit: { default: '' },
     lower_limit: { default: '' },
     rigid: { default: 'false', rule: rule(:bool) },
-    units_exponent: { default: '', rule: rule(:int_range, (-6..6).map {|n| n * 3}) },
+    units_exponent: { default: '', rule: rule(:int_range, -18..18) },
     sumup: { default: 'false', rule: rule(:bool) },
     step: { excludable: true, rule: rule(:uint) },
     cf: { default: 'AVERAGE', rule: rule(:choice, 'AVERAGE', 'MAX') }

@@ -194,7 +194,7 @@ class Focuslight::RRD
     rrdoptions.push('-u', args[:upper_limit]) unless args[:upper_limit].empty?
     rrdoptions.push('-l', args[:lower_limit]) unless args[:lower_limit].empty?
     rrdoptions.push('-r') if args[:rigid]
-    rrdoptions.push('--units-exponent', args[:units_exponent]) unless args[:units_exponent].empty?
+    rrdoptions.push('--units-exponent', args[:units_exponent]) if args[:units_exponent]
 
     defs = []
     datas.each_with_index do |data, i|
