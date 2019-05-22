@@ -25,7 +25,7 @@ RRDTool and its dependencies must be installed before installing Focuslight.
 
 ## Installation
 
-Install focuslight with Ruby 2.1 or later. 
+Install focuslight with Ruby 2.4 or later.
 
 ### Gem package
 
