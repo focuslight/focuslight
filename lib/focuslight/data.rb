@@ -21,7 +21,7 @@ class Focuslight::Data
   end
 
   def number_type
-    @floatings ? Float : Integer
+    @floatings ? Float : Bignum
   end
 
   def create_tables
@@ -38,7 +38,7 @@ class Focuslight::Data
         column :description, String, default: "", null: false
         column :sort, Integer, default: 0, null: false
         column :color, String, default: "#00CC00", null: false
-        column :ulimit, ntype, default: 1000000000000000, null: false
+        column :ulimit, ntype, default: 1000_0000_0000_0000, null: false
         column :llimit, ntype, default: 0, null: false
         column :type, String, default: "AREA", null: false
         String :meta, text: true
