@@ -21,7 +21,7 @@ class Focuslight::Data
   end
 
   def number_type
-    @floatings ? Float : Bignum
+    @floatings ? Float : :Bignum
   end
 
   def create_tables
