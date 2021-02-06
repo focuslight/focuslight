@@ -6,10 +6,11 @@ require "focuslight"
 
 class Focuslight::CLI < Thor
   BASE_DIR = File.join(Dir.pwd, "focuslight")
-  DATA_DIR = File.join(BASE_DIR, "data")
-  DBURL = "sqlite://#{File.join(DATA_DIR, "gforecast.db")}"
+  DATA_DIR = ENV["DATADIR"] || File.join(BASE_DIR, "data")
+  DBURL = ENV["DBURL"] || "sqlite://#{File.join(DATA_DIR, "gforecast.db")}"
   LOG_DIR = File.join(BASE_DIR, "log")
-  LOG_FILE = File.join(LOG_DIR, "application.log")
+  LOG_FILE = ENV["LOG_FILE"] || File.join(LOG_DIR, "application.log")
+  LOG_LEVEL = ENV["LOG_LEVEL"] || "warn"
   ENV_FILE = File.join(BASE_DIR, ".env")
   PROCFILE = File.join(BASE_DIR, "Procfile")
   CONFIGRU_FILE = File.join(BASE_DIR, "config.ru")
@@ -27,7 +28,7 @@ DBURL=#{DBURL}
 # RRDCACHED=n
 # MOUNT=/
 LOG_PATH=#{LOG_FILE}
-LOG_LEVEL=warn
+LOG_LEVEL=#{LOG_LEVEL}
 EOS
 
   DEFAULT_PROCFILE =<<-EOS
