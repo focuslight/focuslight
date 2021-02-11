@@ -15,7 +15,7 @@ services:
       FLOAT_SUPPORT: n
       DBURL: mysql2://root:root@db/focuslight
       DBTIMEOUT: 60000
-      LOG_PATH: log/application.log
+      LOG_FILE: log/application.log
       LOG_LEVEL: warn
     tty: true
     stdin_open: true
