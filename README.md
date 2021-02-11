@@ -70,6 +70,21 @@ mysql> GRANT  CREATE, ALTER, DELETE, INSERT, UPDATE, SELECT \\
 
 After that, follow the same procedure with the SQLite case.
 
+### Using Docker
+
+You can use Docker to build a focuslight development environment for MySQL.
+
+bash
+$ git clone https://github.com/focuslight/focuslight.git
+$ cd focuslight
+$ docker-compose build
+$ docker-compose up
+$ docker-compose exec app bash
+$ mysql -u root -proot -h db
+mysql> CREATE DATABASE focuslight;
+mysql> \q
+$ bundle exec focuslight init
+
 ## Configuration
 
 To configure Focuslight, edit the `.env` file in the project root directory.
