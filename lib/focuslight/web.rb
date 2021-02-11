@@ -47,7 +47,7 @@ class Focuslight::Web < Sinatra::Base
       optstring = nil
 
       if options.is_a? Hash
-        optstring = '?' + options.map { |k,v| "#{k}=#{URI.escape(v.to_s, /[^#{URI::PATTERN::UNRESERVED}]/)}" }.join('&')
+        optstring = '?' + options.map { |k,v| "#{k}=#{URI.encode_www_form_component(v.to_s)}" }.join('&')
       end
 
       case mode
