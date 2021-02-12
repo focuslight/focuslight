@@ -74,7 +74,7 @@ After that, follow the same procedure with the SQLite case.
 
 You can use Docker to build a focuslight development environment for MySQL.
 
-bash
+```bash
 $ git clone https://github.com/focuslight/focuslight.git
 $ cd focuslight
 $ docker-compose build
@@ -84,6 +84,7 @@ $ mysql -u root -proot -h db
 mysql> CREATE DATABASE focuslight;
 mysql> \q
 $ bundle exec focuslight init
+```
 
 ## Configuration
 
