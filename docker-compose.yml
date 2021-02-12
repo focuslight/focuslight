@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    command: /bin/sh -c "bundle install -j 4 && bundle exec focuslight start"
+    ports:
+      - '5125:5125'
+    volumes:
+      - .:/app
+      - gem-data:/usr/local/bundle
+    environment:
+      DATADIR: ./data
+      PORT: 5125
+      HOST: 0.0.0.0
+      FLOAT_SUPPORT: n
+      DBURL: mysql2://root:root@db/focuslight
+      DBTIMEOUT: 60000
+      LOG_FILE: log/application.log
+      LOG_LEVEL: warn
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    ports:
+      - '4306:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+volumes:
+  db-data:
+  gem-data:

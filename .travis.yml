@@ -1,13 +1,13 @@
 language: ruby
 rvm:
-  - 2.5
+  - 2.7
 gemfile:
   - Gemfile
-bundler_args: --deployment
+bundler_args:
 cache: bundler
 before_install:
   - sudo apt-get install rrdtool librrd-dev sqlite3 libsqlite3-dev
-  - gem update --system
-  - gem install -v "1.17.3" bundler
+  - gem install -v "2.1.4" bundler
+  - bundle config set path vendor/bundle
 before_script:
   - bundle exec focuslight init
