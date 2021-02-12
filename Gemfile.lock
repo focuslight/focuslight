@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    focuslight (0.2.4)
+    focuslight (0.2.5)
       dotenv
       erubi
       foreman
