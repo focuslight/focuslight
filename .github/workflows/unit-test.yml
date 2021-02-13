@@ -8,7 +8,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-16.04, ubuntu-18.04]
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
         ruby: [2.5, 2.6, 2.7]
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -37,3 +37,10 @@ jobs:
         run: |
           bundle exec focuslight init
           bundle exec rake
+
+  post-test:
+    name: All tests passed
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: echo ok
