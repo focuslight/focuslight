@@ -1,6 +1,6 @@
 # Focuslight
 
-[![Build Status](https://travis-ci.org/focuslight/focuslight.png?branch=master)](https://travis-ci.org/focuslight/focuslight)
+[![Build Status](https://github.com/focuslight/focuslight/workflows/Unit%20test%20on%20Ubuntu/badge.svg)](https://github.com/focuslight/focuslight/actions)
 
 Focuslight is a lightning Fast Graphing/Visualization tool, built on RRDTool. It is a Ruby clone of [GrowthForecast](http://kazeburo.github.io/GrowthForecast/).
 
@@ -74,7 +74,7 @@ After that, follow the same procedure with the SQLite case.
 
 You can use Docker to build a focuslight development environment for MySQL.
 
-bash
+```bash
 $ git clone https://github.com/focuslight/focuslight.git
 $ cd focuslight
 $ docker-compose build
@@ -84,6 +84,7 @@ $ mysql -u root -proot -h db
 mysql> CREATE DATABASE focuslight;
 mysql> \q
 $ bundle exec focuslight init
+```
 
 ## Configuration
 
