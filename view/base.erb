@@ -75,20 +75,16 @@ Focuslight
 <div id="wrap">
 
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
-      <button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-    <div class="navbar-collapse collapse">
-      <ul class="navbar-nav">
-        <li class="nav-item <%= pathinfo[4] != :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/' %>">Home</a></li>
-        <li class="nav-item <%= pathinfo[4] == :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/docs' %>">Docs</a></li>
-      </ul>
-    </div>
+  <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
+  <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="navbar-collapse collapse">
+    <ul class="navbar-nav">
+      <li class="nav-item <%= pathinfo[4] != :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/' %>">Home</a></li>
+      <li class="nav-item <%= pathinfo[4] == :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/docs' %>">Docs</a></li>
+    </ul>
   </div>
 </nav>
 
@@ -115,7 +111,7 @@ Focuslight
 
     <div class="row">
       <% header_left_col_cls = pathinfo.size >= 3 ? "col-md-10" : "col-md-8" %>
-      <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-4" %>
+      <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-5" %>
       <% term_arg = pathinfo.size == 4 ? {t: pathinfo[4]} : {} %>
       <div class="<%= header_left_col_cls %>">
         <h1>
@@ -127,15 +123,15 @@ Focuslight
         <% if pathinfo.size >= 3 %> » <%= pathinfo[2] %><% end %>
         </h1>
       </div>
-      <div class="<%= header_right_col_cls %>" style="padding-top:25px; text-align:right">
+      <div class="<%= header_right_col_cls %> ml-auto" style="padding-top:25px; text-align:right">
         <% if pathinfo.size == 0 %>
-        <a class="btn btn-outline-dark btn-sm" id="link-fold-all" href="#">fold all</a>
-        <a class="btn btn-outline-dark btn-sm" id="link-expand-all" href="#">expand all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-fold-all" href="#" role="button">fold all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-expand-all" href="#" role="button">expand all</a>
         <% end %>
         <% add_complex_arg = {} %>
         <% add_complex_arg[:service_name] = pathinfo[0] if pathinfo.size >= 1 %>
         <% add_complex_arg[:section_name] = pathinfo[1] if pathinfo.size >= 2 %>
-        <a class="btn btn-outline-dark btn-sm" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
+        <a class="btn btn-outline-dark btn-sm" role="button" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
       </div>
     </div>
     <% end %>
