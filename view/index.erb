@@ -1,19 +1,19 @@
-<div class="panel-group">
 <% services.each do |service| %>
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h2 class="panel-title">
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
     <% if pathinfo.size < 1 %>
-    <a href="#service_<%= service[:name] %>" id="for_service_<%= service[:name] %>" data-toggle="collapse"><span class="glyphicon glyphicon-chevron-down" style="font-size:0.5em; vertical-align: text-middle"></span></a>
+    <a href="#service_<%= service[:name] %>" id="for_service_<%= service[:name] %>" data-toggle="collapse" aria-expanded="true" aria-controls="service_<%= service[:name] %>"><i class="fas fa-chevron-down" style="font-size:0.5em; vertical-align: text-middle"></i></a>
     <% end %>
     <a href="<%= url_for linkpath([service[:name]]) %>"><%= service[:name] %></a>
     </h2>
   </div>
-  <ul class="<%= pathinfo.size < 1 ? 'service_section ' : '' %>list-group panel-collapse in" id="service_<%= service[:name] %>">
+  <div class="card-body collapse.show <%= pathinfo.size < 1 ? 'service_section ' : '' %>" id="service_<%= service[:name] %>">
+  <ul class="list-group">
     <% service[:sections].each do |section| %>
     <li class="list-group-item "><a href="<%= url_for linkpath([ service[:name], section ]) %>"><%= section %></a></li>
     <% end %>
   </ul>
+  </div>
 </div>
 <% end %>
-</div>

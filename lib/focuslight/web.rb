@@ -450,6 +450,8 @@ class Focuslight::Web < Sinatra::Base
       g.stack = !!(stack =~ /^(1|true)$/i)
       data << g
     end
+    p data
+    p req_params.hash
     graph_img = rrd().graph(data, req_params.hash)
     [200, {'Content-Type' => 'image/png'}, graph_img]
   end

@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 <link rel="shortcut icon" href="<%= url_for '/favicon.ico', v: 2 %>" type="image/vnd.microsoft.icon" />
 <link rel="stylesheet" href="<%= url_for '/css/bootstrap.min.css' %>">
+<link rel="stylesheet" href="<%= url_for '/css/all.min.css' %>">
 <style type='text/css'>
 .modal form {
   margin: 0 0;
@@ -41,6 +42,8 @@
 html,
 body {
   height: 100%;
+  min-height: 75rem;
+  padding-top: 2.0rem;
   /* The html and body elements cannot have any padding or margin. */
 }
 
@@ -71,29 +74,23 @@ Focuslight
 <body>
 <div id="wrap">
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
-    </div>
-    <div class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li class="<%= pathinfo[4] != :docs ? 'active' : '' %>"><a href="<%= url_for '/' %>">Home</a></li>
-        <li class="<%= pathinfo[4] == :docs ? 'active' : '' %>"><a href="<%= url_for '/docs' %>">Docs</a></li>
-      </ul>
-    </div>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top" role="navigation">
+  <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
+  <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="navbar-collapse collapse">
+    <ul class="navbar-nav">
+      <li class="nav-item <%= pathinfo[4] != :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/' %>">Home</a></li>
+      <li class="nav-item <%= pathinfo[4] == :docs ? 'active' : '' %>"><a class="nav-link" href="<%= url_for '/docs' %>">Docs</a></li>
+    </ul>
   </div>
-</div>
+</nav>
 
 <div class="container">
 
-  <div class="page-header">
+  <div class="pb-2 mt-4 mb-2 border-bottom">
 
     <% if pathinfo[4] %>
     <div class="row">
@@ -114,7 +111,7 @@ Focuslight
 
     <div class="row">
       <% header_left_col_cls = pathinfo.size >= 3 ? "col-md-10" : "col-md-8" %>
-      <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-4" %>
+      <% header_right_col_cls = pathinfo.size >= 3 ? "col-md-2" : "col-md-5" %>
       <% term_arg = pathinfo.size == 4 ? {t: pathinfo[4]} : {} %>
       <div class="<%= header_left_col_cls %>">
         <h1>
@@ -126,15 +123,15 @@ Focuslight
         <% if pathinfo.size >= 3 %> » <%= pathinfo[2] %><% end %>
         </h1>
       </div>
-      <div class="<%= header_right_col_cls %>" style="padding-top:25px; text-align:right">
+      <div class="<%= header_right_col_cls %> ml-auto" style="padding-top:25px; text-align:right">
         <% if pathinfo.size == 0 %>
-        <a class="btn btn-default btn-sm" id="link-fold-all" href="#">fold all</a>
-        <a class="btn btn-default btn-sm" id="link-expand-all" href="#">expand all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-fold-all" href="#" role="button">fold all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-expand-all" href="#" role="button">expand all</a>
         <% end %>
         <% add_complex_arg = {} %>
         <% add_complex_arg[:service_name] = pathinfo[0] if pathinfo.size >= 1 %>
         <% add_complex_arg[:section_name] = pathinfo[1] if pathinfo.size >= 2 %>
-        <a class="btn btn-default btn-sm" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
+        <a class="btn btn-outline-dark btn-sm" role="button" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
       </div>
     </div>
     <% end %>
@@ -155,7 +152,7 @@ Focuslight
   </div>
 </div>
 
-<script type="text/javascript" src="<%= url_for '/js/jquery-1.10.2.min.js' %>"></script>
+<script type="text/javascript" src="<%= url_for '/js/jquery-3.5.1.slim.min.js' %>"></script>
 <script type="text/javascript" src="<%= url_for '/js/bootstrap.min.js' %>"></script>
 <script type="text/javascript" src="<%= url_for '/js/jquery.storageapi.min.js' %>"></script>
 <script type="text/javascript" src="<%= url_for '/js/site.js' %>"></script>
@@ -175,14 +172,14 @@ $(function(){
     .on('hidden.bs.collapse', function (e) {
       var id = $(e.target).attr('id');
       $.localStorage.set(id,'hide');
-      $('#for_'+id).find('span').removeClass('glyphicon-chevron-down')
-                                .addClass('glyphicon-chevron-right');
+      $('#for_'+id).find('i').removeClass('fa-chevron-down')
+                                .addClass('fa-chevron-right');
     })
     .on('shown.bs.collapse', function (e) {
       var id = $(e.target).attr('id');
       $.localStorage.remove(id);
-      $('#for_'+id).find('span').removeClass('glyphicon-chevron-right')
-                                .addClass('glyphicon-chevron-down');
+      $('#for_'+id).find('i').removeClass('fa-chevron-right')
+                                .addClass('fa-chevron-down');
     })
   ;
 
