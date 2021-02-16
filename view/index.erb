@@ -8,8 +8,8 @@
     <a href="<%= url_for linkpath([service[:name]]) %>"><%= service[:name] %></a>
     </h2>
   </div>
-  <div class="card-body collapse.show" id="service_<%= service[:name] %>">
-  <ul class="list-group <%= pathinfo.size < 1 ? 'service_section ' : '' %>">
+  <div class="card-body collapse.show <%= pathinfo.size < 1 ? 'service_section ' : '' %>" id="service_<%= service[:name] %>">
+  <ul class="list-group">
     <% service[:sections].each do |section| %>
     <li class="list-group-item "><a href="<%= url_for linkpath([ service[:name], section ]) %>"><%= section %></a></li>
     <% end %>

@@ -77,13 +77,11 @@ Focuslight
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
+      <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
       <button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="navbar-toggler-icon"></span>
-        <span class="navbar-toggler-icon"></span>
-        <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="<%= url_for '/' %>">Focuslight</a>
     </div>
     <div class="navbar-collapse collapse">
       <ul class="navbar-nav">
@@ -131,13 +129,13 @@ Focuslight
       </div>
       <div class="<%= header_right_col_cls %>" style="padding-top:25px; text-align:right">
         <% if pathinfo.size == 0 %>
-        <a class="btn btn-default btn-sm" id="link-fold-all" href="#">fold all</a>
-        <a class="btn btn-default btn-sm" id="link-expand-all" href="#">expand all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-fold-all" href="#">fold all</a>
+        <a class="btn btn-outline-dark btn-sm" id="link-expand-all" href="#">expand all</a>
         <% end %>
         <% add_complex_arg = {} %>
         <% add_complex_arg[:service_name] = pathinfo[0] if pathinfo.size >= 1 %>
         <% add_complex_arg[:section_name] = pathinfo[1] if pathinfo.size >= 2 %>
-        <a class="btn btn-default btn-sm" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
+        <a class="btn btn-outline-dark btn-sm" href="<%= url_for '/add_complex', add_complex_arg %>">add complex graph</a>
       </div>
     </div>
     <% end %>
@@ -178,14 +176,14 @@ $(function(){
     .on('hidden.bs.collapse', function (e) {
       var id = $(e.target).attr('id');
       $.localStorage.set(id,'hide');
-      $('#for_'+id).find('span').removeClass('glyphicon-chevron-down')
-                                .addClass('glyphicon-chevron-right');
+      $('#for_'+id).find('i').removeClass('fa-chevron-down')
+                                .addClass('fa-chevron-right');
     })
     .on('shown.bs.collapse', function (e) {
       var id = $(e.target).attr('id');
       $.localStorage.remove(id);
-      $('#for_'+id).find('span').removeClass('glyphicon-chevron-right')
-                                .addClass('glyphicon-chevron-down');
+      $('#for_'+id).find('i').removeClass('fa-chevron-right')
+                                .addClass('fa-chevron-down');
     })
   ;
 
